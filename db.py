@@ -10,7 +10,7 @@ Todas las demás funciones solo escriben su consulta SQL y usan un ayudante.
 
 import psycopg2
 import psycopg2.extras
-from config import DB_CONFIG
+from config import DB_CONFIG, DATABASE_URL
 
 
 # ============================================================
@@ -19,7 +19,7 @@ from config import DB_CONFIG
 
 def conectar():
     """Abre una conexión nueva con la base de datos."""
-    return psycopg2.connect(**DB_CONFIG)
+        return psycopg2.connect(DATABASE_URL)
 
 
 def consultar(sql, datos=(), uno=False):
