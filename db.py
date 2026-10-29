@@ -19,7 +19,7 @@ from config import DB_CONFIG, DATABASE_URL
 
 def conectar():
     """Abre una conexión nueva con la base de datos."""
-        return psycopg2.connect(DATABASE_URL)
+    return psycopg2.connect(DATABASE_URL)
 
 
 def consultar(sql, datos=(), uno=False):
