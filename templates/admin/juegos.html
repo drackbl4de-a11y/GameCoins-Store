@@ -1,0 +1,41 @@
+{% extends "admin/base_admin.html" %}
+{% block titulo %}Juegos - Admin{% endblock %}
+
+{% block contenido %}
+<div class="gcs-admin-header">
+    <h2>Juegos</h2>
+    <a href="{{ url_for('admin.juego_nuevo') }}" class="gcs-btn gcs-btn-primario">+ Nuevo juego</a>
+</div>
+
+<div class="gcs-admin-tabla-wrap">
+    <table class="gcs-admin-tabla">
+        <thead>
+            <tr><th>Nombre</th><th>Descripción</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+            {% for juego in juegos %}
+                <tr>
+                    <td>{{ juego.nombre }}</td>
+                    <td>{{ juego.descripcion or "—" }}</td>
+                    <td>
+                        <span class="gcs-admin-badge {{ 'gcs-admin-badge-activo' if juego.estado else 'gcs-admin-badge-inactivo' }}">
+                            {{ "Activo" if juego.estado else "Inactivo" }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="gcs-acciones">
+                            <a href="{{ url_for('admin.juego_editar', juego_id=juego.juego_id) }}" class="gcs-btn gcs-btn-outline">Editar</a>
+                            <form method="POST" action="{{ url_for('admin.juego_estado', juego_id=juego.juego_id) }}">
+                                <input type="hidden" name="estado" value="{{ 'desactivar' if juego.estado else 'activar' }}">
+                                <button type="submit" class="gcs-btn gcs-btn-outline">{{ "Desactivar" if juego.estado else "Activar" }}</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="4">Todavía no hay juegos creados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

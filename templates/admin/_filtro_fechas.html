@@ -1,0 +1,30 @@
+{# Buscador por fecha que se reutiliza en varias páginas del admin.
+   Uso:  {{ filtro_fechas(desde, hasta, cantidad) }}  #}
+{% macro filtro_fechas(desde, hasta, cantidad) %}
+<form method="GET" class="gcs-filtro-fechas">
+    <div>
+        <label for="desde">Desde</label>
+        <input type="date" id="desde" name="desde" value="{{ desde or '' }}">
+    </div>
+    <div>
+        <label for="hasta">Hasta</label>
+        <input type="date" id="hasta" name="hasta" value="{{ hasta or '' }}">
+    </div>
+    <button type="submit" class="gcs-btn gcs-btn-primario">Buscar</button>
+    {% if desde or hasta %}
+        <a href="?" class="gcs-btn gcs-btn-outline">Limpiar</a>
+    {% endif %}
+    <span class="gcs-filtro-resultado">
+        {{ cantidad }} resultado{{ 's' if cantidad != 1 }}
+        {% if desde or hasta %}· para ver un solo día, pon la misma fecha en los dos campos{% endif %}
+    </span>
+</form>
+{% endmacro %}
+
+{# Muestra "Hoy" / "Ayer" / "Hace 1 semana" y debajo la fecha exacta #}
+{% macro fecha_relativa(fecha, con_hora=True) %}
+    {% if fecha %}
+        <strong class="gcs-fecha-hace">{{ fecha|hace }}</strong><br>
+        <span class="gcs-paquete-moneda">{{ fecha.strftime("%d/%m/%Y %H:%M" if con_hora else "%d/%m/%Y") }}</span>
+    {% else %}—{% endif %}
+{% endmacro %}

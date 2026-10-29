@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block titulo %}Página no encontrada - GameCoins Store{% endblock %}
+
+{% block contenido %}
+<section class="gcs-form-wrap">
+    <div class="gcs-form" style="text-align:center;">
+        <div style="font-size:52px; margin-bottom:6px;">🔎</div>
+        <h1>404</h1>
+        <p style="color:var(--texto-suave); margin-bottom:20px;">
+            Esta página no existe o el enlace está roto. Revisa la dirección o vuelve al inicio.
+        </p>
+        <a href="{{ url_for('inicio') }}" class="gcs-btn gcs-btn-primario gcs-btn-ancho">Volver al inicio</a>
+    </div>
+</section>
+{% endblock %}

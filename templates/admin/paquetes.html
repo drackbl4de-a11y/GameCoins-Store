@@ -1,0 +1,64 @@
+{% extends "admin/base_admin.html" %}
+{% block titulo %}Paquetes - Admin{% endblock %}
+
+{% block contenido %}
+<div class="gcs-admin-header">
+    <h2>Paquetes</h2>
+    <a href="{{ url_for('admin.paquete_nuevo') }}" class="gcs-btn gcs-btn-primario">+ Nuevo paquete</a>
+</div>
+
+<div class="gcs-admin-tabla-wrap">
+    <table class="gcs-admin-tabla">
+        <thead>
+            <tr><th>Juego</th><th>Paquete</th><th>Cantidad</th><th>Precio COP</th><th>Stock</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+            {% for paquete in paquetes %}
+                <tr>
+                    <td>{{ paquete.juego_nombre }}</td>
+                    <td>{{ paquete.nombre }}</td>
+                    <td>{{ paquete.cantidad_monedas }} {{ paquete.moneda_nombre }}</td>
+                    <td>{{ "{:,.0f}".format(paquete.precio_cop).replace(",", ".") }}</td>
+                    <td>
+                        <div class="gcs-stock-celda">
+                            <span class="gcs-stock-numero {{ 'gcs-stock-agotado' if paquete.stock <= 0 else ('gcs-stock-poco' if paquete.stock <= 3 else 'gcs-stock-ok') }}">{{ paquete.stock }}</span>
+                            <span class="gcs-stock-texto">
+                                {% if paquete.stock <= 0 %}AGOTADO
+                                {% elif paquete.stock <= 3 %}quedan pocas
+                                {% else %}unidades{% endif %}
+                            </span>
+                        </div>
+                        <details class="gcs-rellenar-det">
+                            <summary>＋ Rellenar</summary>
+                            <form method="POST" action="{{ url_for('admin.paquete_rellenar', paquete_id=paquete.paquete_id) }}" class="gcs-rellenar">
+                                <input type="number" name="cantidad" min="1" placeholder="¿Cuántas?" required aria-label="Unidades a agregar">
+                                <button type="submit" class="gcs-btn gcs-btn-primario">Agregar</button>
+                            </form>
+                        </details>
+                    </td>
+                    <td>
+                        <span class="gcs-admin-badge {{ 'gcs-admin-badge-activo' if paquete.estado else 'gcs-admin-badge-inactivo' }}">
+                            {{ "Activo" if paquete.estado else "Inactivo" }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="gcs-acciones">
+                            <a href="{{ url_for('admin.paquete_editar', paquete_id=paquete.paquete_id) }}" class="gcs-btn gcs-btn-outline">Editar</a>
+                            <form method="POST" action="{{ url_for('admin.paquete_estado', paquete_id=paquete.paquete_id) }}">
+                                <input type="hidden" name="estado" value="{{ 'desactivar' if paquete.estado else 'activar' }}">
+                                <button type="submit" class="gcs-btn gcs-btn-outline">{{ "Desactivar" if paquete.estado else "Activar" }}</button>
+                            </form>
+                            <form method="POST" action="{{ url_for('admin.paquete_eliminar', paquete_id=paquete.paquete_id) }}"
+                                  onsubmit="return confirm('¿Eliminar este paquete? Esta acción no se puede deshacer.');">
+                                <button type="submit" class="gcs-btn gcs-btn-peligro">Eliminar</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="7">Todavía no hay paquetes creados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

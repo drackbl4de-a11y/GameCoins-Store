@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block titulo %}Opiniones - GameCoins Store{% endblock %}
+
+{% block contenido %}
+<section class="gcs-opiniones">
+
+    <header class="gcs-opiniones-titulo">
+        <h2>Opiniones de nuestros usuarios</h2>
+        <p>Lo que dicen quienes ya compraron en GameCoins Store</p>
+    </header>
+
+    {# --- Resumen de calificaciones --- #}
+    {% if promedio %}
+        {% set total = comentarios|length %}
+        <div class="gcs-opiniones-resumen">
+            <div class="gcs-opiniones-promedio">
+                <span class="gcs-resumen-numero">{{ promedio }}</span>
+                <span class="gcs-estrellas-lectura" style="font-size:18px;">
+                    {% for i in range(1, 6) %}{% if i <= promedio|round(0, 'floor') %}★{% else %}☆{% endif %}{% endfor %}
+                </span>
+                <span class="gcs-paquete-moneda">{{ total }} {{ 'opinión' if total == 1 else 'opiniones' }}</span>
+            </div>
+            <div class="gcs-opiniones-barras">
+                {% for estrella in [5, 4, 3, 2, 1] %}
+                    {% set cantidad = comentarios|selectattr("calificacion", "equalto", estrella)|list|length %}
+                    <div class="gcs-barra-fila">
+                        <span>{{ estrella }} ★</span>
+                        <div class="gcs-barra"><div style="width: {{ (cantidad / total * 100)|round|int }}%;"></div></div>
+                        <span class="gcs-barra-cantidad">{{ cantidad }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    {# --- Formulario para opinar --- #}
+    <div class="gcs-opiniones-form">
+        <h3 class="gcs-checkout-subtitulo">Deja tu opinión</h3>
+
+        {% if session.get('usuario_id') %}
+            <form method="POST" class="gcs-form-comentario">
+                <p class="gcs-paquete-moneda" style="margin:0;">¿Cómo fue tu experiencia?</p>
+                <div class="gcs-estrellas">
+                    <input type="radio" id="estrella5" name="calificacion" value="5"><label for="estrella5">★</label>
+                    <input type="radio" id="estrella4" name="calificacion" value="4"><label for="estrella4">★</label>
+                    <input type="radio" id="estrella3" name="calificacion" value="3"><label for="estrella3">★</label>
+                    <input type="radio" id="estrella2" name="calificacion" value="2"><label for="estrella2">★</label>
+                    <input type="radio" id="estrella1" name="calificacion" value="1"><label for="estrella1">★</label>
+                </div>
+                <textarea name="contenido" rows="3" placeholder="Escribe tu comentario para esta página..." class="gcs-textarea"></textarea>
+                <button type="submit" class="gcs-btn gcs-btn-primario">Publicar</button>
+            </form>
+        {% else %}
+            <p class="gcs-catalogo-nota" style="margin:0;">
+                <a href="{{ url_for('login') }}">Inicia sesión</a> para dejar tu opinión.
+            </p>
+        {% endif %}
+    </div>
+
+    {# --- Lista de opiniones --- #}
+    <h3 class="gcs-opiniones-subtitulo">Lo que dicen nuestros usuarios</h3>
+
+    {% if comentarios %}
+        <div class="gcs-opiniones-lista">
+            {% for c in comentarios %}
+                <article class="gcs-comentario-card">
+                    <div class="gcs-comentario-avatar">
+                        {% if c.usuario_foto %}
+                            <img src="{{ url_for('static', filename=c.usuario_foto) }}" alt="" class="gcs-comentario-foto">
+                        {% else %}
+                            {{ c.usuario_nombre[0]|upper }}
+                        {% endif %}
+                    </div>
+                    <div class="gcs-comentario-cuerpo">
+                        <div class="gcs-comentario-header">
+                            <strong>{{ c.usuario_nombre }}</strong>
+                            <span class="gcs-paquete-moneda">{{ c.fecha_comentario.strftime("%d/%m/%Y") }}</span>
+                        </div>
+                        <span class="gcs-estrellas-lectura">
+                            {% for i in range(1, 6) %}{% if i <= c.calificacion %}★{% else %}☆{% endif %}{% endfor %}
+                        </span>
+                        <p>{{ c.contenido }}</p>
+                        {% if c.respuesta_admin %}
+                            <div class="gcs-respuesta">
+                                <span class="gcs-respuesta-titulo">Respuesta de GameCoins Store · {{ c.fecha_respuesta|hace }}</span>
+                                <p>{{ c.respuesta_admin }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="gcs-catalogo-nota" style="text-align:center;">Todavía no hay opiniones. ¡Sé el primero en dejar una!</p>
+    {% endif %}
+</section>
+{% endblock %}

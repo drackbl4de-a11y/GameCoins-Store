@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% import "_iconos.html" as iconos %}
+{% block titulo %}Buscar: {{ texto }} - GameCoins Store{% endblock %}
+
+{% block contenido %}
+<section class="gcs-catalogo-preview">
+    <h2>Resultados para "{{ texto }}"</h2>
+
+    {% if paquetes %}
+        <div class="gcs-paquete-grid">
+            {% for paquete in paquetes %}
+                <div class="gcs-paquete-card {{ iconos.clase_juego(paquete.juego_nombre) }}">
+                    {% if paquete.porcentaje_descuento %}
+                        <span class="gcs-badge-descuento">-{{ paquete.porcentaje_descuento|int }}%</span>
+                    {% endif %}
+                    {{ iconos.icono_producto(paquete.juego_nombre, paquete.paquete_id, paquete.imagen_url or paquete.moneda_imagen_url) }}
+                    <p class="gcs-paquete-moneda">{{ paquete.juego_nombre }}</p>
+                    <h3>{{ paquete.nombre }}</h3>
+                    <p class="gcs-paquete-moneda">{{ paquete.moneda_nombre }}</p>
+                    {% if paquete.porcentaje_descuento %}
+                        <p class="gcs-precio-original">COP {{ "{:,.0f}".format(paquete.precio_cop).replace(",", ".") }}</p>
+                        <p class="gcs-paquete-precio">COP {{ "{:,.0f}".format(paquete.precio_con_descuento).replace(",", ".") }}</p>
+                    {% else %}
+                        <p class="gcs-paquete-precio">COP {{ "{:,.0f}".format(paquete.precio_cop).replace(",", ".") }}</p>
+                    {% endif %}
+                    {% if paquete.stock <= 0 %}
+                        <p class="gcs-paquete-agotado">AGOTADO</p>
+                        <button type="button" class="gcs-btn gcs-btn-outline gcs-btn-ancho" disabled>Agotado</button>
+                    {% else %}
+                        <p class="{{ 'gcs-paquete-quedan' if paquete.stock <= 5 else 'gcs-paquete-disponibles' }}">
+                            {% if paquete.stock <= 5 %}¡Quedan solo {{ paquete.stock }}!{% else %}{{ paquete.stock }} disponibles{% endif %}
+                        </p>
+                        <form method="POST" action="{{ url_for('agregar_al_carrito', paquete_id=paquete.paquete_id) }}">
+                            <button type="submit" class="gcs-btn gcs-btn-primario gcs-btn-ancho">Agregar al carrito</button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="gcs-catalogo-nota">No encontramos paquetes que coincidan con tu búsqueda.</p>
+    {% endif %}
+</section>
+{% endblock %}

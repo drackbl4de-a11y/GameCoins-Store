@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block titulo %}Pedido {{ compra.codigo_pedido }} - GameCoins Store{% endblock %}
+
+{% block contenido %}
+<section class="gcs-catalogo-preview">
+    <h2>Resumen de tu compra</h2>
+
+    <div class="gcs-checkout" style="grid-template-columns: 1fr 1fr;">
+        <div class="gcs-checkout-columna">
+            <h3 class="gcs-checkout-subtitulo">Pedido {{ compra.codigo_pedido }}</h3>
+            <div class="gcs-checkout-item">
+                <span class="gcs-paquete-moneda">Fecha</span>
+                <span>{{ compra.fecha_compra.strftime("%d/%m/%Y %H:%M") }}</span>
+            </div>
+            <div class="gcs-checkout-item">
+                <span class="gcs-paquete-moneda">Estado</span>
+                <span class="gcs-badge-estado gcs-badge-{{ compra.estado_pedido|lower }}">{{ compra.estado_pedido }}</span>
+            </div>
+            <div class="gcs-carrito-resumen">
+                <span>Total</span>
+                <span class="gcs-paquete-precio">COP {{ "{:,.0f}".format(compra.total_cop).replace(",", ".") }}</span>
+            </div>
+
+            {% if compra.estado_pedido == 'ENTREGADO' %}
+                <a href="{{ url_for('descargar_certificado', compra_id=compra.compra_id) }}" class="gcs-btn gcs-btn-primario gcs-btn-ancho" style="text-decoration:none; text-align:center; margin-top:6px;">
+                    📄 Descargar certificado de compra
+                </a>
+                <form method="POST" action="{{ url_for('enviar_certificado', compra_id=compra.compra_id) }}">
+                    <button type="submit" class="gcs-btn gcs-btn-outline gcs-btn-ancho" style="margin-top:8px;">
+                        ✉️ Enviar certificado a mi correo
+                    </button>
+                </form>
+            {% elif compra.estado_pedido == 'CANCELADO' %}
+                <p class="gcs-catalogo-nota">Este pedido fue cancelado. Si tienes dudas, escríbenos desde Contacto.</p>
+            {% else %}
+                <p class="gcs-catalogo-nota">Tu pedido está en proceso. Cuando sea entregado te enviaremos un correo con el certificado y podrás descargarlo aquí.</p>
+            {% endif %}
+        </div>
+
+        <div class="gcs-checkout-columna">
+            <h3 class="gcs-checkout-subtitulo">Paquetes del pedido</h3>
+            <div class="gcs-carrito-lista">
+                {% for item in items %}
+                    <div class="gcs-carrito-fila">
+                        <div class="gcs-carrito-fila-info">
+                            <span class="gcs-paquete-moneda">{{ item.juego_nombre }} · {{ item.moneda_nombre }}</span>
+                            <h3>{{ item.paquete_nombre }}</h3>
+                            <span class="gcs-paquete-moneda">Entregado a: {{ item.dato_entrega }}</span>
+                        </div>
+                        <div class="gcs-carrito-fila-precio">COP {{ "{:,.0f}".format(item.subtotal).replace(",", ".") }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <p class="gcs-catalogo-nota" style="margin-top:20px;">
+        <a href="{{ url_for('perfil', tab='pedidos') }}">← Ver todos mis pedidos</a>
+    </p>
+</section>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "admin/base_admin.html" %}
+{% block titulo %}Promociones - Admin{% endblock %}
+
+{% block contenido %}
+<div class="gcs-admin-header">
+    <h2>Promociones</h2>
+    <a href="{{ url_for('admin.promocion_nueva') }}" class="gcs-btn gcs-btn-primario">+ Nueva promoción</a>
+</div>
+
+<div class="gcs-admin-tabla-wrap">
+    <table class="gcs-admin-tabla">
+        <thead>
+            <tr><th>Paquete</th><th>Título</th><th>Descuento</th><th>Vigencia</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+            {% for promo in promociones %}
+                <tr>
+                    <td>{{ promo.juego_nombre }} — {{ promo.paquete_nombre }}</td>
+                    <td>{{ promo.titulo }}</td>
+                    <td>{{ promo.porcentaje_descuento|int }}%</td>
+                    <td>{{ promo.fecha_inicio.strftime("%d/%m/%y") }} – {{ promo.fecha_fin.strftime("%d/%m/%y") }}</td>
+                    <td>
+                        <span class="gcs-admin-badge {{ 'gcs-admin-badge-activo' if promo.estado else 'gcs-admin-badge-inactivo' }}">
+                            {{ "Activa" if promo.estado else "Inactiva" }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="gcs-acciones">
+                            <a href="{{ url_for('admin.promocion_editar', promocion_id=promo.promocion_id) }}" class="gcs-btn gcs-btn-outline">Editar</a>
+                            <form method="POST" action="{{ url_for('admin.promocion_estado', promocion_id=promo.promocion_id) }}">
+                                <input type="hidden" name="estado" value="{{ 'desactivar' if promo.estado else 'activar' }}">
+                                <button type="submit" class="gcs-btn gcs-btn-outline">{{ "Desactivar" if promo.estado else "Activar" }}</button>
+                            </form>
+                            <form method="POST" action="{{ url_for('admin.promocion_eliminar', promocion_id=promo.promocion_id) }}"
+                                  onsubmit="return confirm('¿Eliminar esta promoción? Esta acción no se puede deshacer.');">
+                                <button type="submit" class="gcs-btn gcs-btn-peligro">Eliminar</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6">Todavía no hay promociones creadas.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

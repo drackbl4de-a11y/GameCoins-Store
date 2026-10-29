@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block titulo %}Tu carrito - GameCoins Store{% endblock %}
+
+{% block contenido %}
+<section class="gcs-catalogo-preview">
+    <h2>Tu carrito</h2>
+
+    {% if items %}
+        <div class="gcs-checkout">
+            <div class="gcs-checkout-columna">
+                <h3 class="gcs-checkout-subtitulo">{{ items|length }} paquete{{ 's' if items|length != 1 }} en tu carrito</h3>
+
+                <div class="gcs-carrito-lista">
+                    {% for item in items %}
+                        <div class="gcs-carrito-fila">
+                            <div class="gcs-carrito-fila-info">
+                                <span class="gcs-paquete-moneda">{{ item.juego_nombre }} · {{ item.moneda_nombre }}</span>
+                                <h3>{{ item.paquete_nombre }}</h3>
+                                <span class="gcs-paquete-moneda">Precio unitario: COP {{ "{:,.0f}".format(item.precio_unitario).replace(",", ".") }}</span>
+                                {% if item.stock_disponible < item.cantidad %}
+                                    <span class="gcs-paquete-agotado">
+                                        {% if item.stock_disponible <= 0 %}AGOTADO: quítalo para continuar{% else %}Solo quedan {{ item.stock_disponible }}: baja la cantidad{% endif %}
+                                    </span>
+                                {% elif item.stock_disponible <= 5 %}
+                                    <span class="gcs-paquete-quedan">¡Quedan solo {{ item.stock_disponible }}!</span>
+                                {% else %}
+                                    <span class="gcs-paquete-disponibles">{{ item.stock_disponible }} disponibles</span>
+                                {% endif %}
+                            </div>
+
+                            <form method="POST" action="{{ url_for('actualizar_carrito', detalle_id=item.detalle_carrito_id) }}" class="gcs-carrito-cantidad">
+                                <button type="submit" name="accion" value="restar" class="gcs-btn gcs-btn-outline gcs-btn-cantidad">−</button>
+                                <span>{{ item.cantidad }}</span>
+                                <button type="submit" name="accion" value="sumar" class="gcs-btn gcs-btn-outline gcs-btn-cantidad"
+                                        {% if item.cantidad >= item.stock_disponible %}disabled title="No hay más unidades"{% endif %}>+</button>
+                            </form>
+
+                            <div class="gcs-carrito-fila-precio">
+                                COP {{ "{:,.0f}".format(item.subtotal).replace(",", ".") }}
+                            </div>
+
+                            <form method="POST" action="{{ url_for('eliminar_del_carrito', detalle_id=item.detalle_carrito_id) }}">
+                                <button type="submit" class="gcs-btn gcs-btn-outline gcs-btn-eliminar">Eliminar</button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <a href="{{ url_for('inicio') }}" class="gcs-catalogo-nota" style="display:inline-block; margin-top:18px;">← Seguir comprando</a>
+            </div>
+
+            <div class="gcs-checkout-columna">
+                <h3 class="gcs-checkout-subtitulo">Resumen del pedido</h3>
+
+                {% for item in items %}
+                    <div class="gcs-checkout-item">
+                        <span class="gcs-paquete-moneda">{{ item.paquete_nombre }} × {{ item.cantidad }}</span>
+                        <span class="gcs-paquete-moneda">COP {{ "{:,.0f}".format(item.subtotal).replace(",", ".") }}</span>
+                    </div>
+                {% endfor %}
+
+                <div class="gcs-carrito-resumen">
+                    <span>Total</span>
+                    <span class="gcs-paquete-precio">COP {{ "{:,.0f}".format(total).replace(",", ".") }}</span>
+                </div>
+
+                <a href="{{ url_for('checkout') }}" class="gcs-btn gcs-btn-primario gcs-btn-grande gcs-btn-ancho" style="text-align:center; text-decoration:none;">Confirmar compra</a>
+                <p class="gcs-catalogo-nota" style="margin-top:14px;">Pago simulado — no se procesa ningún cobro real.</p>
+            </div>
+        </div>
+    {% else %}
+        <p class="gcs-catalogo-nota">Tu carrito está vacío. <a href="{{ url_for('inicio') }}">Explora el catálogo</a>.</p>
+    {% endif %}
+</section>
+{% endblock %}

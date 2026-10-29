@@ -1,0 +1,51 @@
+{% extends "admin/base_admin.html" %}
+{% block titulo %}{{ "Editar promoción" if promocion else "Nueva promoción" }} - Admin{% endblock %}
+
+{% block contenido %}
+<div class="gcs-admin-header">
+    <h2>{{ "Editar promoción" if promocion else "Nueva promoción" }}</h2>
+</div>
+
+<form method="POST" class="gcs-admin-form">
+    {% if not promocion %}
+        <label for="paquete_id">Paquete</label>
+        <select id="paquete_id" name="paquete_id" required>
+            <option value="">Selecciona un paquete</option>
+            {% for paquete in paquetes %}
+                <option value="{{ paquete.paquete_id }}" {% if valores.get('paquete_id')|string == paquete.paquete_id|string %}selected{% endif %}>
+                    {{ paquete.juego_nombre }} — {{ paquete.nombre }}
+                </option>
+            {% endfor %}
+        </select>
+    {% endif %}
+
+    <label for="titulo">Título</label>
+    <input type="text" id="titulo" name="titulo" value="{{ valores.get('titulo', '') }}" placeholder="Ej. Recarga con descuento" required>
+
+    <label for="descripcion">Descripción</label>
+    <textarea id="descripcion" name="descripcion" rows="2">{{ valores.get('descripcion', '') }}</textarea>
+
+    <div class="gcs-perfil-fila-doble">
+        <div>
+            <label for="porcentaje_descuento">Porcentaje de descuento</label>
+            <input type="number" id="porcentaje_descuento" name="porcentaje_descuento" value="{{ valores.get('porcentaje_descuento', '') }}" min="1" max="90" required>
+        </div>
+    </div>
+
+    <div class="gcs-perfil-fila-doble">
+        <div>
+            <label for="fecha_inicio">Fecha de inicio</label>
+            <input type="date" id="fecha_inicio" name="fecha_inicio" value="{{ valores.get('fecha_inicio', '') }}" required>
+        </div>
+        <div>
+            <label for="fecha_fin">Fecha de fin</label>
+            <input type="date" id="fecha_fin" name="fecha_fin" value="{{ valores.get('fecha_fin', '') }}" required>
+        </div>
+    </div>
+
+    <div class="gcs-form-botones">
+        <button type="submit" class="gcs-btn gcs-btn-primario">{{ "Guardar cambios" if promocion else "Crear promoción" }}</button>
+        <a href="{{ url_for('admin.promociones') }}" class="gcs-btn gcs-btn-outline">Cancelar</a>
+    </div>
+</form>
+{% endblock %}

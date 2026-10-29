@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% import "_iconos.html" as iconos %}
+{% block titulo %}Promociones - GameCoins Store{% endblock %}
+
+{% block contenido %}
+<section class="gcs-catalogo-preview">
+    <h2>Promociones activas</h2>
+
+    {% if promociones %}
+        <div class="gcs-paquete-grid">
+            {% for promo in promociones %}
+                <a href="{{ url_for('catalogo', juego_id=promo.juego_id) }}" class="gcs-paquete-card gcs-paquete-promo {{ iconos.clase_juego(promo.juego_nombre) }}">
+                    <span class="gcs-badge-descuento">-{{ promo.porcentaje_descuento|int }}%</span>
+                    {{ iconos.icono_producto(promo.juego_nombre, promo.promocion_id, promo.paquete_imagen_url or promo.moneda_imagen_url) }}
+                    <p class="gcs-paquete-moneda">{{ promo.juego_nombre }}</p>
+                    <h3>{{ promo.paquete_nombre }}</h3>
+                    <p class="gcs-precio-original">COP {{ "{:,.0f}".format(promo.precio_cop).replace(",", ".") }}</p>
+                    <p class="gcs-paquete-precio">COP {{ "{:,.0f}".format(promo.precio_con_descuento).replace(",", ".") }}</p>
+                    {% if promo.stock <= 0 %}<p class="gcs-paquete-agotado">AGOTADO</p>
+                    {% elif promo.stock <= 5 %}<p class="gcs-paquete-quedan">¡Quedan solo {{ promo.stock }}!</p>
+                    {% else %}<p class="gcs-paquete-disponibles">{{ promo.stock }} disponibles</p>{% endif %}
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="gcs-catalogo-nota">No hay promociones activas por ahora. Vuelve pronto.</p>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "admin/base_admin.html" %}
+{% block titulo %}Venta {{ compra.codigo_pedido }} - Admin{% endblock %}
+
+{% block contenido %}
+<div class="gcs-admin-header">
+    <h2>Pedido {{ compra.codigo_pedido }}</h2>
+    <a href="{{ url_for('admin.ventas') }}" class="gcs-btn gcs-btn-outline">← Volver</a>
+</div>
+
+<div class="gcs-checkout" style="grid-template-columns: 1fr 1fr;">
+    <div class="gcs-checkout-columna">
+        <h3 class="gcs-checkout-subtitulo">Información del pedido</h3>
+        <div class="gcs-checkout-item"><span class="gcs-paquete-moneda">Usuario</span><span>{{ compra.usuario_nombre }} ({{ compra.usuario_correo }})</span></div>
+        <div class="gcs-checkout-item"><span class="gcs-paquete-moneda">Fecha</span><span>{{ compra.fecha_compra|hace }} · {{ compra.fecha_compra.strftime("%d/%m/%Y %H:%M") }}</span></div>
+        <div class="gcs-checkout-item"><span class="gcs-paquete-moneda">Total</span><span class="gcs-paquete-precio">COP {{ "{:,.0f}".format(compra.total_cop).replace(",", ".") }}</span></div>
+
+        <form method="POST" action="{{ url_for('admin.venta_estado', compra_id=compra.compra_id) }}" class="gcs-admin-form" style="margin-top:18px;">
+            <label for="estado_pedido">Estado del pedido</label>
+            <select id="estado_pedido" name="estado_pedido">
+                <option value="PROCESADO" {% if compra.estado_pedido == 'PROCESADO' %}selected{% endif %}>PROCESADO</option>
+                <option value="ENTREGADO" {% if compra.estado_pedido == 'ENTREGADO' %}selected{% endif %}>ENTREGADO</option>
+                <option value="CANCELADO" {% if compra.estado_pedido == 'CANCELADO' %}selected{% endif %}>CANCELADO</option>
+            </select>
+            <button type="submit" class="gcs-btn gcs-btn-primario" style="margin-top:12px;">Actualizar estado</button>
+            <p class="gcs-paquete-moneda" style="margin-top:10px;">Al cambiar a ENTREGADO o CANCELADO, el cliente recibe un correo automático
+                (el de ENTREGADO lleva el certificado en PDF).</p>
+        </form>
+    </div>
+
+    <div class="gcs-checkout-columna">
+        <h3 class="gcs-checkout-subtitulo">Paquetes comprados</h3>
+        <div class="gcs-carrito-lista">
+            {% for item in items %}
+                <div class="gcs-carrito-fila">
+                    <div class="gcs-carrito-fila-info">
+                        <span class="gcs-paquete-moneda">{{ item.juego_nombre }} · {{ item.moneda_nombre }}</span>
+                        <h3>{{ item.paquete_nombre }}</h3>
+                        <span class="gcs-paquete-moneda">Entregado a: {{ item.dato_entrega }}</span>
+                    </div>
+                    <div class="gcs-carrito-fila-precio">COP {{ "{:,.0f}".format(item.subtotal).replace(",", ".") }}</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

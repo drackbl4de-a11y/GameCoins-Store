@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block titulo %}Contáctanos - GameCoins Store{% endblock %}
+
+{% block contenido %}
+<section class="gcs-pagina">
+    <h1>Contáctanos</h1>
+    <p class="gcs-pagina-intro">¿Algo salió mal con tu compra o tienes una duda? Escríbenos y te ayudamos.</p>
+
+    <div class="gcs-contacto-card">
+        <div class="gcs-contacto-icono">💬</div>
+        <div class="gcs-contacto-texto">
+            <h2>WhatsApp</h2>
+            <p>Es la vía más rápida para reportar errores en una compra.</p>
+            <strong>{{ whatsapp_numero }}</strong>
+        </div>
+        <a href="{{ whatsapp_url }}" target="_blank" rel="noopener" class="gcs-btn gcs-btn-primario gcs-btn-grande">Escribir por WhatsApp</a>
+
+        {# El QR solo se muestra en pantallas grandes (PC): en el celular se usa el botón #}
+        <figure class="gcs-contacto-qr">
+            <img src="{{ url_for('static', filename='img/whatsapp-qr.png') }}" alt="Código QR para escribirnos por WhatsApp">
+            <figcaption>¿Estás en el computador?<br>Escanéalo con la cámara de tu celular</figcaption>
+        </figure>
+    </div>
+
+    <h2>Antes de escribirnos</h2>
+    <ul class="gcs-lista">
+        <li>Ten a la mano tu <strong>código de pedido</strong> (empieza por <code>GCS-</code>). Lo encuentras en <a href="{{ url_for('perfil', tab='pedidos') }}">tu perfil (pestaña Pedidos)</a>.</li>
+        <li>Cuéntanos qué pasó: por ejemplo, si el estado no cambió, si pusiste mal tu usuario de Roblox o tu ID de VALORANT, o si el total no coincide.</li>
+        <li>Puedes adjuntar tu certificado de compra en PDF para agilizar la revisión.</li>
+    </ul>
+
+    <p class="gcs-pagina-nota">
+        También puedes revisar las <a href="{{ url_for('faq') }}">preguntas frecuentes</a>: quizá tu duda ya tiene respuesta ahí.
+    </p>
+</section>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block titulo %}Registrarse - GameCoins Store{% endblock %}
+
+{% block contenido %}
+<section class="gcs-form-wrap">
+    <form method="POST" class="gcs-form">
+        <img src="{{ url_for('static', filename='img/logo-simple.jpeg') }}" alt="GameCoins Store" class="gcs-form-logo">
+        <h1>Crear cuenta</h1>
+        <p class="gcs-form-subtitulo">Regístrate para comprar tus monedas favoritas</p>
+
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" name="nombre" required autofocus>
+
+        <label for="apellido">Apellido</label>
+        <input type="text" id="apellido" name="apellido" required>
+
+        <label for="correo">Correo</label>
+        <input type="email" id="correo" name="correo" required>
+
+        <label for="contrasena">Contraseña</label>
+        <input type="password" id="contrasena" name="contrasena" required minlength="6">
+
+        <label for="confirmar_contrasena">Repite la contraseña</label>
+        <input type="password" id="confirmar_contrasena" name="confirmar_contrasena" required minlength="6">
+
+        <button type="submit" class="gcs-btn gcs-btn-primario gcs-btn-ancho">Registrarse</button>
+
+        <p class="gcs-form-alterna">
+            ¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia sesión</a>
+        </p>
+    </form>
+</section>
+{% endblock %}

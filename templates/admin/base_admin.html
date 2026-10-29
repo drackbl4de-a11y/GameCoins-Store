@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}Admin - GameCoins Store{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="gcs-admin-layout">
+        <aside class="gcs-admin-sidebar">
+            <a href="{{ url_for('admin.dashboard') }}" class="gcs-admin-logo">
+                <img src="{{ url_for('static', filename='img/logo-simple.jpeg') }}" alt="GCS">
+                <div>GCS <span>Admin</span><small>Panel de control</small></div>
+            </a>
+
+            <nav>
+                <span class="gcs-admin-seccion">Principal</span>
+                <a href="{{ url_for('admin.dashboard') }}" class="{{ 'gcs-admin-activo' if request.path == url_for('admin.dashboard') }}"><i>📊</i> Dashboard</a>
+
+                <span class="gcs-admin-seccion">Catálogo</span>
+                <a href="{{ url_for('admin.juegos') }}" class="{{ 'gcs-admin-activo' if request.path.startswith('/admin/juegos') }}"><i>🎮</i> Juegos</a>
+                <a href="{{ url_for('admin.paquetes') }}" class="{{ 'gcs-admin-activo' if request.path.startswith('/admin/paquetes') }}"><i>📦</i> Paquetes</a>
+                <a href="{{ url_for('admin.promociones') }}" class="{{ 'gcs-admin-activo' if request.path.startswith('/admin/promociones') }}"><i>🏷️</i> Promociones</a>
+
+                <span class="gcs-admin-seccion">Ventas y clientes</span>
+                <a href="{{ url_for('admin.ventas') }}" class="{{ 'gcs-admin-activo' if request.path.startswith('/admin/ventas') }}"><i>🧾</i> Ventas</a>
+                <a href="{{ url_for('admin.usuarios') }}" class="{{ 'gcs-admin-activo' if request.path.startswith('/admin/usuarios') }}"><i>👥</i> Usuarios</a>
+                <a href="{{ url_for('admin.comentarios') }}" class="{{ 'gcs-admin-activo' if request.path.startswith('/admin/comentarios') }}"><i>💬</i> Comentarios</a>
+
+                <span class="gcs-admin-seccion">Sistema</span>
+                <a href="{{ url_for('admin.auditoria') }}" class="{{ 'gcs-admin-activo' if request.path.startswith('/admin/auditoria') }}"><i>🕒</i> Auditoría</a>
+            </nav>
+
+            <div class="gcs-admin-sidebar-footer">
+                <div class="gcs-admin-usuario">
+                    <div class="gcs-admin-usuario-avatar">{{ (session.get('usuario_nombre') or 'A')[0]|upper }}</div>
+                    <div>
+                        <strong>{{ session.get('usuario_nombre') }}</strong>
+                        <span>Administrador</span>
+                    </div>
+                </div>
+                <a href="{{ url_for('inicio') }}" class="gcs-btn gcs-btn-outline">← Volver al sitio</a>
+                <a href="{{ url_for('logout') }}" class="gcs-btn gcs-btn-outline">Cerrar sesión</a>
+            </div>
+        </aside>
+
+        <main class="gcs-admin-main">
+            <div class="gcs-admin-contenido">
+            {% with mensajes = get_flashed_messages(with_categories=true) %}
+                {% if mensajes %}
+                    <div class="gcs-mensajes" style="margin:0 0 20px; max-width:none; padding:0;">
+                        {% for categoria, mensaje in mensajes %}
+                            <div class="gcs-mensaje gcs-mensaje-{{ categoria }}">{{ mensaje }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block contenido %}{% endblock %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>

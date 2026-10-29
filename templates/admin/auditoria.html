@@ -1,0 +1,32 @@
+{% extends "admin/base_admin.html" %}
+{% from "admin/_filtro_fechas.html" import filtro_fechas, fecha_relativa %}
+{% block titulo %}Auditoría - Admin{% endblock %}
+
+{% block contenido %}
+<div class="gcs-admin-header">
+    <h2>Auditoría</h2>
+</div>
+
+{{ filtro_fechas(desde, hasta, registros|length) }}
+
+<div class="gcs-admin-tabla-wrap">
+    <table class="gcs-admin-tabla">
+        <thead>
+            <tr><th>Fecha</th><th>Administrador</th><th>Acción</th><th>Entidad</th><th>Detalle</th></tr>
+        </thead>
+        <tbody>
+            {% for r in registros %}
+                <tr>
+                    <td>{{ fecha_relativa(r.fecha_accion) }}</td>
+                    <td>{{ r.admin_nombre }}</td>
+                    <td>{{ r.accion }}</td>
+                    <td>{{ r.entidad_afectada }} #{{ r.entidad_id }}</td>
+                    <td>{{ r.detalle }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="5">No hay acciones para mostrar.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

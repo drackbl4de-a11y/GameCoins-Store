@@ -1,0 +1,42 @@
+{% extends "admin/base_admin.html" %}
+{% from "admin/_filtro_fechas.html" import filtro_fechas, fecha_relativa %}
+{% block titulo %}Usuarios - Admin{% endblock %}
+
+{% block contenido %}
+<div class="gcs-admin-header">
+    <h2>Usuarios</h2>
+</div>
+
+{{ filtro_fechas(desde, hasta, usuarios|length) }}
+
+<div class="gcs-admin-tabla-wrap">
+    <table class="gcs-admin-tabla">
+        <thead>
+            <tr><th>Nombre</th><th>Correo</th><th>Registrado</th><th>Último login</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+                <tr>
+                    <td>{{ usuario.nombre }} {{ usuario.apellido }}</td>
+                    <td>{{ usuario.correo }}</td>
+                    <td>{{ fecha_relativa(usuario.fecha_registro, False) }}</td>
+                    <td>{{ fecha_relativa(usuario.ultimo_login) }}</td>
+                    <td>
+                        <span class="gcs-admin-badge {{ 'gcs-admin-badge-activo' if usuario.estado == 'A' else 'gcs-admin-badge-inactivo' }}">
+                            {{ "Activo" if usuario.estado == 'A' else "Inactivo" }}
+                        </span>
+                    </td>
+                    <td>
+                        <form method="POST" action="{{ url_for('admin.usuario_estado', usuario_id=usuario.usuario_id) }}">
+                            <input type="hidden" name="estado" value="{{ 'desactivar' if usuario.estado == 'A' else 'activar' }}">
+                            <button type="submit" class="gcs-btn gcs-btn-outline">{{ "Desactivar" if usuario.estado == 'A' else "Activar" }}</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6">No hay usuarios para mostrar.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

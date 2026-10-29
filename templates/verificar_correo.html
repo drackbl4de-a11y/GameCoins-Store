@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block titulo %}Verifica tu correo - GameCoins Store{% endblock %}
+
+{% block contenido %}
+<section class="gcs-form-wrap">
+    <form method="POST" class="gcs-form">
+        <img src="{{ url_for('static', filename='img/logo-simple.jpeg') }}" alt="GameCoins Store" class="gcs-form-logo">
+        <h1>Verifica tu correo</h1>
+        <p class="gcs-form-subtitulo">Enviamos un código de 6 números a <strong>{{ correo }}</strong>. Escríbelo aquí (vence en 10 minutos).</p>
+
+        <label for="codigo">Código de verificación</label>
+        <input type="text" id="codigo" name="codigo" required autofocus maxlength="6"
+               inputmode="numeric" pattern="[0-9]{6}" autocomplete="one-time-code"
+               style="text-align:center; font-size:24px; letter-spacing:8px;">
+
+        <button type="submit" class="gcs-btn gcs-btn-primario gcs-btn-ancho">Confirmar y crear cuenta</button>
+
+        <p class="gcs-form-alterna">
+            ¿No te llegó? Revisa spam o
+            <button type="submit" formaction="{{ url_for('reenviar_codigo') }}" formnovalidate
+                    style="background:none;border:none;padding:0;color:var(--cian);cursor:pointer;font:inherit;">reenvía el código</button>.
+            <br><a href="{{ url_for('registro') }}">Cambiar el correo</a>
+        </p>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,100 @@
+{# ------------------------------------------------------------
+   Macros reutilizables para mostrar juegos y paquetes.
+   Si el admin subió una imagen se muestra esa; si no, se dibuja
+   un ícono propio (moneda dorada / gema morada / genérico).
+   ------------------------------------------------------------ #}
+
+{% macro svg_moneda(juego_nombre, sufijo) %}
+{% if juego_nombre == 'Roblox' %}
+<svg viewBox="0 0 64 64" class="gcs-paquete-icono" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="grad-moneda-{{ sufijo }}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffb15c"/>
+            <stop offset="100%" stop-color="#ff6a5c"/>
+        </linearGradient>
+    </defs>
+    <circle cx="32" cy="32" r="28" fill="url(#grad-moneda-{{ sufijo }})"/>
+    <circle cx="32" cy="32" r="28" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2"/>
+    <circle cx="32" cy="32" r="20" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="2"/>
+    <path d="M32 20 L38 30 L32 44 L26 30 Z" fill="#ffffff" fill-opacity="0.55"/>
+</svg>
+{% elif juego_nombre == 'VALORANT' %}
+<svg viewBox="0 0 64 64" class="gcs-paquete-icono" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="grad-gema-{{ sufijo }}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff3d78"/>
+            <stop offset="100%" stop-color="#6d2560"/>
+        </linearGradient>
+    </defs>
+    <polygon points="32,6 50,26 32,58 14,26" fill="url(#grad-gema-{{ sufijo }})"/>
+    <polygon points="32,6 50,26 32,32 14,26" fill="#ffffff" fill-opacity="0.18"/>
+    <polygon points="32,6 14,26 20,26 32,14" fill="#ffffff" fill-opacity="0.3"/>
+</svg>
+{% else %}
+<svg viewBox="0 0 64 64" class="gcs-paquete-icono" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="grad-generico-{{ sufijo }}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2dd9c4"/>
+            <stop offset="100%" stop-color="#1c6b60"/>
+        </linearGradient>
+    </defs>
+    <circle cx="32" cy="32" r="28" fill="url(#grad-generico-{{ sufijo }})"/>
+    <circle cx="32" cy="32" r="20" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="2"/>
+</svg>
+{% endif %}
+{% endmacro %}
+
+
+{# Recuadro con la imagen de un paquete (o el ícono de la moneda, o el dibujo por defecto) #}
+{% macro icono_producto(juego_nombre, sufijo, imagen=None) %}
+<div class="gcs-paquete-visual">
+    {% if imagen %}
+        <img src="{{ url_for('static', filename=imagen) }}" alt="" class="gcs-paquete-imagen">
+    {% else %}
+        {{ svg_moneda(juego_nombre, sufijo) }}
+    {% endif %}
+</div>
+{% endmacro %}
+
+
+{# Logo de un juego (o el dibujo por defecto) para las tarjetas y cabeceras #}
+{% macro icono_juego(juego_nombre, sufijo, imagen=None) %}
+{% if imagen %}
+    <img src="{{ url_for('static', filename=imagen) }}" alt="{{ juego_nombre }}" class="gcs-juego-logo">
+{% else %}
+    {{ svg_moneda(juego_nombre, sufijo) }}
+{% endif %}
+{% endmacro %}
+
+
+{% macro clase_juego(nombre) %}{% if nombre == 'Roblox' %}gcs-juego-roblox{% elif nombre == 'VALORANT' %}gcs-juego-valorant{% else %}gcs-juego-generica{% endif %}{% endmacro %}
+
+
+{# Tarjeta de un juego (se usa en el inicio y en la página Juegos) #}
+{% macro tarjeta_juego(juego) %}
+<a href="{{ url_for('catalogo', juego_id=juego.juego_id) }}" class="gcs-juego-card {{ clase_juego(juego.nombre) }}">
+    <div class="gcs-juego-portada">
+        {% if juego.imagen_url %}
+            <img src="{{ url_for('static', filename=juego.imagen_url) }}" alt="{{ juego.nombre }}" class="gcs-juego-cover">
+        {% else %}
+            {{ icono_juego(juego.nombre, 'juego' ~ juego.juego_id) }}
+        {% endif %}
+    </div>
+    <div class="gcs-juego-info">
+        <div class="gcs-juego-titulo">
+            <h3>{{ juego.nombre }}</h3>
+            {% if juego.total_paquetes %}
+                <span class="gcs-juego-meta">{{ juego.moneda_nombre or 'Monedas' }} · {{ juego.total_paquetes }} paquete{{ 's' if juego.total_paquetes != 1 }}</span>
+            {% else %}
+                <span class="gcs-juego-meta">Sin paquetes por ahora</span>
+            {% endif %}
+        </div>
+    </div>
+    {% if juego.total_paquetes %}
+        <div class="gcs-juego-desde">
+            <small>Desde</small>
+            <span class="gcs-juego-precio">COP {{ "{:,.0f}".format(juego.precio_desde).replace(",", ".") }}</span>
+        </div>
+    {% endif %}
+</a>
+{% endmacro %}

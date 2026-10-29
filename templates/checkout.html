@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block titulo %}Finalizar compra - GameCoins Store{% endblock %}
+
+{% block contenido %}
+<section class="gcs-catalogo-preview">
+    <h2>Finalizar compra</h2>
+
+    <form method="POST" class="gcs-checkout">
+        <div class="gcs-checkout-columna">
+            <h3 class="gcs-checkout-subtitulo">Resumen del pedido</h3>
+            {% for item in items %}
+                <div class="gcs-checkout-item">
+                    <div class="gcs-checkout-item-info">
+                        <strong>{{ item.paquete_nombre }}</strong>
+                        <span class="gcs-paquete-moneda">{{ item.juego_nombre }} · cantidad: {{ item.cantidad }}</span>
+                    </div>
+                    <span class="gcs-checkout-item-precio">COP {{ "{:,.0f}".format(item.subtotal).replace(",", ".") }}</span>
+                </div>
+
+                {% if item.juego_nombre == 'Roblox' %}
+                    <label for="dato_entrega_{{ item.detalle_carrito_id }}">Usuario de Roblox (para "{{ item.paquete_nombre }}")</label>
+                    <input type="text" id="dato_entrega_{{ item.detalle_carrito_id }}"
+                           name="dato_entrega_{{ item.detalle_carrito_id }}"
+                           value="{{ valores.get('dato_entrega_' ~ item.detalle_carrito_id, '') }}"
+                           placeholder="TuUsuarioDeRoblox">
+                {% elif item.juego_nombre == 'VALORANT' %}
+                    <label for="dato_entrega_{{ item.detalle_carrito_id }}">ID de jugador de VALORANT (para "{{ item.paquete_nombre }}")</label>
+                    <input type="text" id="dato_entrega_{{ item.detalle_carrito_id }}"
+                           name="dato_entrega_{{ item.detalle_carrito_id }}"
+                           value="{{ valores.get('dato_entrega_' ~ item.detalle_carrito_id, '') }}"
+                           placeholder="Usuario#TAG">
+                {% else %}
+                    <label for="dato_entrega_{{ item.detalle_carrito_id }}">Dato de entrega (para "{{ item.paquete_nombre }}")</label>
+                    <input type="text" id="dato_entrega_{{ item.detalle_carrito_id }}"
+                           name="dato_entrega_{{ item.detalle_carrito_id }}"
+                           value="{{ valores.get('dato_entrega_' ~ item.detalle_carrito_id, '') }}">
+                {% endif %}
+            {% endfor %}
+
+            <div class="gcs-carrito-resumen">
+                <span>Total del pedido</span>
+                <span class="gcs-paquete-precio">COP {{ "{:,.0f}".format(total).replace(",", ".") }}</span>
+            </div>
+        </div>
+
+        <div class="gcs-checkout-columna">
+            <h3 class="gcs-checkout-subtitulo">Pago con Nequi (simulado)</h3>
+            <p class="gcs-catalogo-nota" style="margin-top:-6px;">
+                Este es un proyecto académico: no se procesa ningún cobro real, ni se envía nada a Nequi de verdad.
+            </p>
+
+            <div class="gcs-nequi-aviso">
+                📱 Vas a "pagar" con Nequi. Ingresa el nombre y el número de celular registrados en la cuenta.
+            </div>
+
+            <label for="nombre_titular">Nombre completo</label>
+            <input type="text" id="nombre_titular" name="nombre_titular" value="{{ valores.get('nombre_titular', '') }}">
+
+            <label for="numero_celular">Número de celular Nequi</label>
+            <input type="text" id="numero_celular" name="numero_celular" value="{{ valores.get('numero_celular', '') }}" placeholder="300 000 0000" inputmode="numeric" maxlength="10">
+
+            <button type="submit" class="gcs-btn gcs-btn-primario gcs-btn-grande gcs-btn-ancho">Confirmar compra</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

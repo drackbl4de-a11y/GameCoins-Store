@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block titulo %}Preguntas frecuentes - GameCoins Store{% endblock %}
+
+{% block contenido %}
+<section class="gcs-pagina">
+    <h1>Preguntas frecuentes</h1>
+    <p class="gcs-pagina-intro">Las dudas más comunes sobre cómo funciona GameCoins Store.</p>
+
+    <div class="gcs-faq">
+        <details>
+            <summary>¿Qué es GameCoins Store?</summary>
+            <p>Es una tienda de monedas para videojuegos (por ahora Robux de Roblox y VALORANT Points). Es un proyecto académico: <strong>no se procesan pagos reales</strong>.</p>
+        </details>
+
+        <details>
+            <summary>¿Cuánto tarda la entrega?</summary>
+            <p>Cuando confirmas tu compra, el pedido queda en estado <strong>PROCESADO</strong> mientras un administrador lo revisa. Cuando cambia a <strong>ENTREGADO</strong>, tu pedido ya fue atendido. Los tiempos pueden variar; si sientes que tarda demasiado, <a href="{{ url_for('contacto') }}">escríbenos por WhatsApp</a>.</p>
+        </details>
+
+        <details>
+            <summary>¿Cómo veo el estado de mi pedido?</summary>
+            <p>Entra a tu <a href="{{ url_for('perfil', tab='pedidos') }}">perfil, pestaña Pedidos</a> (el botón con tu foto, arriba a la derecha). Ahí ves todos tus pedidos con su estado: PROCESADO, ENTREGADO o CANCELADO.</p>
+        </details>
+
+        <details>
+            <summary>¿Cómo pago?</summary>
+            <p>El pago se hace con Nequi, pero es <strong>simulado</strong>: solo pedimos tu nombre y tu número de celular para completar el proceso, y no se hace ningún cobro real.</p>
+        </details>
+
+        <details>
+            <summary>¿Qué datos necesito para recibir mis monedas?</summary>
+            <p>Para <strong>Robux</strong> debes indicar tu usuario de Roblox. Para <strong>VALORANT Points</strong>, tu ID de jugador con el formato <code>Usuario#TAG</code> (por ejemplo, <code>MiUsuario#1234</code>). Revísalos bien antes de confirmar.</p>
+        </details>
+
+        <details>
+            <summary>¿Qué significa que un paquete esté AGOTADO?</summary>
+            <p>Cada paquete se vende en cantidad limitada. Cuando se compran todas las unidades aparece como <strong>AGOTADO</strong> y no se puede agregar al carrito. Si un pedido se cancela, sus unidades vuelven a estar disponibles, y el equipo administrador también puede rellenar el stock. Si necesitas uno agotado, <a href="{{ url_for('contacto') }}">escríbenos por WhatsApp</a>.</p>
+        </details>
+
+        <details>
+            <summary>¿Cómo descargo mi certificado de compra?</summary>
+            <p>En la pestaña <a href="{{ url_for('perfil', tab='pedidos') }}">Pedidos</a> de tu perfil, abre el pedido que quieras y pulsa el botón <strong>Descargar certificado de compra</strong>. El certificado está disponible cuando tu pedido ya fue <strong>ENTREGADO</strong>. Se descarga un PDF con el detalle de lo que compraste. Cuando un administrador marca el pedido como entregado, te lo enviamos automáticamente al correo con el que te registraste, y desde el pedido puedes pulsar <strong>Enviar certificado a mi correo</strong> para recibirlo de nuevo. Si el pedido es cancelado, te avisamos también por correo.</p>
+        </details>
+
+        <details>
+            <summary>¿Puedo cambiar mis datos o mi contraseña?</summary>
+            <p>Sí. Con la sesión iniciada entra a <strong>Mi perfil</strong> (el ícono 👤): ahí puedes cambiar tu foto, tu nombre, tu número de WhatsApp y tu contraseña.</p>
+        </details>
+
+        <details>
+            <summary>Olvidé mi contraseña, ¿qué hago?</summary>
+            <p>Esa función todavía no está disponible. Por ahora, <a href="{{ url_for('contacto') }}">contáctanos por WhatsApp</a> y te ayudamos.</p>
+        </details>
+
+        <details>
+            <summary>¿Cómo contacto al soporte?</summary>
+            <p>Por WhatsApp al <strong>{{ whatsapp_numero }}</strong>, o desde la página <a href="{{ url_for('contacto') }}">Contáctanos</a>.</p>
+        </details>
+    </div>
+</section>
+{% endblock %}

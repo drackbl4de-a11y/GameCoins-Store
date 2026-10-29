@@ -1,0 +1,189 @@
+{# ------------------------------------------------------------
+   Asistente de ayuda: la burbuja de abajo a la derecha.
+   Se incluye en base.html con {% include "_asistente.html" %}.
+   Las respuestas las calcula la ruta /asistente (app.py + asistente.py).
+   ------------------------------------------------------------ #}
+
+<div class="gcs-asistente" id="asistente">
+
+    {# --- Ventana del chat (empieza oculta) --- #}
+    <section class="gcs-asistente-panel" id="asistente-panel" hidden
+             role="dialog" aria-label="Asistente de ayuda de GameCoins Store">
+        <header class="gcs-asistente-cabecera">
+            <div class="gcs-asistente-avatar">🎮</div>
+            <div class="gcs-asistente-titulo">
+                <strong>Asistente GCS</strong>
+                <span>Resuelve problemas de la página</span>
+            </div>
+            <button type="button" class="gcs-asistente-cerrar" id="asistente-cerrar" aria-label="Cerrar el asistente">✕</button>
+        </header>
+
+        <div class="gcs-asistente-mensajes" id="asistente-mensajes" aria-live="polite"></div>
+
+        <div class="gcs-asistente-sugerencias" id="asistente-sugerencias"></div>
+
+        <form class="gcs-asistente-form" id="asistente-form" autocomplete="off">
+            <input type="text" id="asistente-texto" maxlength="300"
+                   placeholder="Escribe tu duda aquí..." aria-label="Escribe tu duda">
+            <button type="submit" aria-label="Enviar">➤</button>
+        </form>
+    </section>
+
+    {# --- La burbuja que se ve siempre --- #}
+    <button type="button" class="gcs-asistente-burbuja" id="asistente-burbuja"
+            aria-label="Abrir el asistente de ayuda" aria-expanded="false" aria-controls="asistente-panel">
+        <span class="gcs-asistente-etiqueta">¿Necesitas ayuda?</span>
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true">
+            <path d="M4 3h16a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+        </svg>
+    </button>
+</div>
+
+<script>
+    // ---------- Asistente de ayuda ----------
+    // Todo el JavaScript está dentro de una función que se ejecuta sola, para no
+    // mezclar sus variables con las del resto de la página.
+    (function () {
+        var burbuja = document.getElementById("asistente-burbuja");
+        var panel = document.getElementById("asistente-panel");
+        var cerrar = document.getElementById("asistente-cerrar");
+        var cajaMensajes = document.getElementById("asistente-mensajes");
+        var cajaSugerencias = document.getElementById("asistente-sugerencias");
+        var formulario = document.getElementById("asistente-form");
+        var campoTexto = document.getElementById("asistente-texto");
+
+        var direccion = "{{ url_for('responder_asistente') }}";   // la ruta de Flask que responde
+        var yaSaludo = false;                                     // para saludar solo la primera vez
+
+        // Agrega una burbuja de texto al chat. "quien" es "bot" o "usuario".
+        function agregarMensaje(texto, quien) {
+            var mensaje = document.createElement("div");
+            mensaje.className = "gcs-asistente-msg gcs-asistente-" + quien;
+            mensaje.textContent = texto;          // textContent: el texto nunca se interpreta como HTML
+            cajaMensajes.appendChild(mensaje);
+            bajarChat();
+            return mensaje;
+        }
+
+        function bajarChat() {
+            cajaMensajes.scrollTop = cajaMensajes.scrollHeight;
+        }
+
+        // Muestra la respuesta que mandó Flask: texto, imagen (QR), botones de enlace y sugerencias
+        function mostrarRespuesta(datos) {
+            var mensaje = agregarMensaje(datos.respuesta, "bot");
+
+            if (datos.imagen) {
+                var imagen = document.createElement("img");
+                imagen.src = datos.imagen;
+                imagen.alt = "Código QR de WhatsApp";
+                imagen.className = "gcs-asistente-qr";
+                mensaje.appendChild(imagen);
+            }
+
+            if (datos.enlaces.length > 0) {
+                var contenedor = document.createElement("div");
+                contenedor.className = "gcs-asistente-enlaces";
+                datos.enlaces.forEach(function (enlace) {
+                    var a = document.createElement("a");
+                    a.href = enlace.url;
+                    a.textContent = enlace.texto;
+                    a.className = "gcs-asistente-enlace";
+                    if (enlace.externo) {
+                        a.target = "_blank";
+                        a.rel = "noopener";
+                    }
+                    contenedor.appendChild(a);
+                });
+                mensaje.appendChild(contenedor);
+            }
+
+            mostrarSugerencias(datos.sugerencias);
+            bajarChat();
+        }
+
+        // Dibuja los botoncitos de sugerencia debajo del chat
+        function mostrarSugerencias(lista) {
+            cajaSugerencias.innerHTML = "";
+            lista.forEach(function (sugerencia) {
+                var boton = document.createElement("button");
+                boton.type = "button";
+                boton.className = "gcs-asistente-chip";
+                boton.textContent = sugerencia.texto;
+                boton.addEventListener("click", function () {
+                    agregarMensaje(sugerencia.texto, "usuario");
+                    preguntar({ tema: sugerencia.tema });      // el botoncito manda el tema directo
+                });
+                cajaSugerencias.appendChild(boton);
+            });
+        }
+
+        // Envía la pregunta a Flask y muestra la respuesta
+        function preguntar(datos) {
+            // Los tres puntitos de "escribiendo..."
+            var escribiendo = agregarMensaje("", "bot");
+            escribiendo.classList.add("gcs-asistente-escribiendo");
+            escribiendo.innerHTML = "<span></span><span></span><span></span>";
+            cajaSugerencias.innerHTML = "";
+
+            fetch(direccion, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(datos)
+            })
+                .then(function (respuesta) { return respuesta.json(); })
+                .then(function (resultado) {
+                    // Esperamos un momentito para que se note que "está escribiendo"
+                    setTimeout(function () {
+                        escribiendo.remove();
+                        mostrarRespuesta(resultado);
+                    }, 450);
+                })
+                .catch(function () {
+                    escribiendo.remove();
+                    mostrarRespuesta({
+                        respuesta: "No pude conectarme con el servidor. Revisa tu internet e inténtalo de nuevo.",
+                        enlaces: [], sugerencias: []
+                    });
+                });
+        }
+
+        function abrir() {
+            panel.hidden = false;
+            burbuja.classList.add("gcs-asistente-abierta");
+            burbuja.setAttribute("aria-expanded", "true");
+            if (!yaSaludo) {
+                yaSaludo = true;
+                preguntar({ tema: "inicio" });     // la primera vez muestra el saludo y las opciones
+            }
+            campoTexto.focus();
+        }
+
+        function cerrarPanel() {
+            panel.hidden = true;
+            burbuja.classList.remove("gcs-asistente-abierta");
+            burbuja.setAttribute("aria-expanded", "false");
+            burbuja.focus();
+        }
+
+        burbuja.addEventListener("click", function () {
+            if (panel.hidden) { abrir(); } else { cerrarPanel(); }
+        });
+        cerrar.addEventListener("click", cerrarPanel);
+
+        // La tecla Esc también cierra el chat
+        document.addEventListener("keydown", function (evento) {
+            if (evento.key === "Escape" && !panel.hidden) { cerrarPanel(); }
+        });
+
+        // Cuando la persona escribe y presiona Enter (o el botón ➤)
+        formulario.addEventListener("submit", function (evento) {
+            evento.preventDefault();                       // evita que la página se recargue
+            var texto = campoTexto.value.trim();
+            if (texto === "") { return; }
+            agregarMensaje(texto, "usuario");
+            campoTexto.value = "";
+            preguntar({ mensaje: texto });
+        });
+    })();
+</script>

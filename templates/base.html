@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}GameCoins Store{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <header class="gcs-header">
+        <!-- Izquierda: logo y menú -->
+        <div class="gcs-header-izq">
+            <a href="{{ url_for('inicio') }}" class="gcs-logo">
+                <img src="{{ url_for('static', filename='img/logo-simple.jpeg') }}" alt="GameCoins Store">
+            </a>
+            <nav class="gcs-nav">
+                <a href="{{ url_for('inicio') }}">Inicio</a>
+                <a href="{{ url_for('juegos') }}">Juegos</a>
+                <a href="{{ url_for('promociones') }}">Promociones</a>
+                <a href="{{ url_for('comentarios') }}">Opiniones</a>
+            </nav>
+        </div>
+
+        <!-- Centro: buscador -->
+        <form class="gcs-buscador" method="GET" action="{{ url_for('buscar') }}">
+            <input type="text" name="q" placeholder="Busca un juego o una moneda...">
+        </form>
+
+        <!-- Derecha: admin, carrito y botón de perfil -->
+        <div class="gcs-header-acciones">
+            {% if session.get('usuario_id') %}
+                {% if session.get('rol') == 'ADMIN' %}
+                    <a href="{{ url_for('admin.dashboard') }}" class="gcs-icono-header gcs-icono-admin" title="Panel de administrador">🛠️</a>
+                {% endif %}
+                <a href="{{ url_for('ver_carrito') }}" class="gcs-icono-header gcs-carrito-icono" title="Carrito">
+                    🛒
+                    {% if carrito_cantidad and carrito_cantidad > 0 %}
+                        <span class="gcs-carrito-contador">{{ carrito_cantidad }}</span>
+                    {% endif %}
+                </a>
+                <a href="{{ url_for('perfil') }}" class="gcs-perfil-chip" title="Mi perfil">
+                    {% if session.get('foto') %}
+                        <img src="{{ url_for('static', filename=session.get('foto')) }}" alt="" class="gcs-chip-avatar">
+                    {% else %}
+                        <span class="gcs-chip-avatar">{{ session.get('usuario_nombre')[0]|upper }}</span>
+                    {% endif %}
+                    <span>{{ session.get('usuario_nombre') }}</span>
+                </a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="gcs-btn gcs-btn-outline">Iniciar sesión</a>
+                <a href="{{ url_for('registro') }}" class="gcs-btn gcs-btn-primario">Registrarse</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="gcs-main">
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% if mensajes %}
+                <div class="gcs-mensajes">
+                    {% for categoria, mensaje in mensajes %}
+                        <div class="gcs-mensaje gcs-mensaje-{{ categoria }}">{{ mensaje }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block contenido %}{% endblock %}
+    </main>
+
+    <footer class="gcs-footer">
+        <div class="gcs-footer-col">
+            <h4>GameCoins Store</h4>
+            <p>Recarga tus monedas favoritas de forma rápida y segura.</p>
+        </div>
+        <div class="gcs-footer-col">
+            <h4>Síguenos</h4>
+            <a href="{{ instagram_url }}" target="_blank" rel="noopener">Instagram</a>
+            <a href="{{ canal_url }}" target="_blank" rel="noopener">Canal de WhatsApp</a>
+        </div>
+        <div class="gcs-footer-col">
+            <h4>Ayuda</h4>
+            <a href="{{ url_for('contacto') }}">Contáctanos</a>
+            <a href="{{ url_for('politicas') }}">Políticas y Seguridad</a>
+            <a href="{{ url_for('terminos') }}">Términos y Condiciones</a>
+            <a href="{{ url_for('faq') }}">Preguntas Frecuentes</a>
+        </div>
+        <div class="gcs-footer-aviso">
+            Este es un proyecto académico. No se procesan pagos reales.
+        </div>
+    </footer>
+
+    {# Burbuja del asistente de ayuda (abajo a la derecha) #}
+    {% include "_asistente.html" %}
+
+</body>
+</html>

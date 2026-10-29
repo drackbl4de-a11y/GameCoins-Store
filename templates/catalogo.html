@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% import "_iconos.html" as iconos %}
+{% block titulo %}{{ juego.nombre }} - GameCoins Store{% endblock %}
+
+{% block contenido %}
+<section class="gcs-catalogo-preview gcs-catalogo-juego">
+
+    {# ===== Banner grande con la portada del juego ===== #}
+    <div class="gcs-banner {{ iconos.clase_juego(juego.nombre) }}">
+        {% if juego.imagen_url %}
+            <img src="{{ url_for('static', filename=juego.imagen_url) }}" alt="{{ juego.nombre }}" class="gcs-banner-imagen">
+        {% endif %}
+        <div class="gcs-banner-texto">
+            <p class="gcs-migas">
+                <a href="{{ url_for('inicio') }}">Inicio</a> /
+                <a href="{{ url_for('juegos') }}">Juegos</a> /
+                <span>{{ juego.nombre }}</span>
+            </p>
+            <h1>{{ juego.nombre }}</h1>
+            {% if juego.descripcion %}<p class="gcs-banner-desc">{{ juego.descripcion }}</p>{% endif %}
+        </div>
+    </div>
+
+    {% if paquetes %}
+    {# El pack que aparece elegido al abrir: el primero que todavía tenga stock #}
+    {% set disponibles = paquetes|selectattr('stock', 'gt', 0)|list %}
+    {% set primero = disponibles[0] if disponibles else paquetes[0] %}
+    {# Un solo formulario: el radio elegido decide qué paquete se agrega #}
+    <form method="POST" id="form-pack" class="gcs-pack-layout"
+          action="{{ url_for('agregar_al_carrito', paquete_id=primero.paquete_id) }}">
+
+        {# ===== Columna izquierda: los paquetes ===== #}
+        <div>
+            <h2 class="gcs-pack-titulo"><span>1</span> Elige tu pack</h2>
+            <div class="gcs-pack-grid">
+                {% for paquete in paquetes %}
+                {% set precio = paquete.precio_con_descuento if paquete.porcentaje_descuento else paquete.precio_cop %}
+                <label class="gcs-pack {{ iconos.clase_juego(juego.nombre) }} {{ 'gcs-pack-sin-stock' if paquete.stock <= 0 }}">
+                    <input type="radio" name="pack" value="{{ paquete.paquete_id }}"
+                           data-nombre="{{ paquete.nombre }}"
+                           data-precio="{{ '{:,.0f}'.format(precio).replace(',', '.') }}"
+                           data-stock="{{ paquete.stock }}"
+                           {% if paquete.stock <= 0 %}disabled aria-label="{{ paquete.nombre }} agotado"{% endif %}
+                           {% if paquete.paquete_id == primero.paquete_id and paquete.stock > 0 %}checked{% endif %}>
+                    <span class="gcs-pack-caja">
+                        {% if paquete.porcentaje_descuento %}
+                            <span class="gcs-pack-descuento">-{{ paquete.porcentaje_descuento|int }}%</span>
+                        {% endif %}
+                        {% if paquete.stock <= 0 %}
+                            <span class="gcs-pack-agotado">AGOTADO</span>
+                        {% endif %}
+                        <span class="gcs-pack-icono">
+                            {% set img = paquete.imagen_url or paquete.moneda_imagen_url %}
+                            {% if img %}
+                                <img src="{{ url_for('static', filename=img) }}" alt="">
+                            {% else %}
+                                {{ iconos.svg_moneda(juego.nombre, paquete.paquete_id) }}
+                            {% endif %}
+                        </span>
+                        <span class="gcs-pack-cantidad">{{ paquete.cantidad_monedas }}</span>
+                        <span class="gcs-pack-moneda">{{ paquete.moneda_nombre }}</span>
+                        <span class="gcs-pack-stock {{ 'gcs-stock-agotado' if paquete.stock <= 0 else ('gcs-stock-poco' if paquete.stock <= 5 else 'gcs-stock-ok') }}">
+                            {% if paquete.stock <= 0 %}Sin unidades
+                            {% elif paquete.stock <= 5 %}¡Quedan solo {{ paquete.stock }}!
+                            {% else %}{{ paquete.stock }} disponibles{% endif %}
+                        </span>
+                        <span class="gcs-pack-precio">
+                            {% if paquete.porcentaje_descuento %}
+                                <s>COP {{ "{:,.0f}".format(paquete.precio_cop).replace(",", ".") }}</s>
+                            {% endif %}
+                            COP {{ "{:,.0f}".format(precio).replace(",", ".") }}
+                        </span>
+                    </span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# ===== Columna derecha: resumen del pedido ===== #}
+        <aside class="gcs-resumen">
+            <h3>Resumen del pedido</h3>
+            <p class="gcs-resumen-juego">{{ juego.nombre }}</p>
+            <div class="gcs-resumen-fila">
+                <span>Pack</span>
+                <strong id="resumen-nombre">{{ primero.nombre }}</strong>
+            </div>
+            <div class="gcs-resumen-fila">
+                <span>Disponibles</span>
+                <strong id="resumen-stock">{{ primero.stock }} unidades</strong>
+            </div>
+            <div class="gcs-resumen-fila gcs-resumen-total">
+                <span>Total</span>
+                <strong id="resumen-precio">COP {{ "{:,.0f}".format(primero.precio_con_descuento if primero.porcentaje_descuento else primero.precio_cop).replace(",", ".") }}</strong>
+            </div>
+            {% if disponibles %}
+                <button type="submit" class="gcs-btn gcs-btn-primario gcs-btn-ancho">Continuar</button>
+            {% else %}
+                <button type="button" class="gcs-btn gcs-btn-outline gcs-btn-ancho" disabled>Todos los packs están agotados</button>
+            {% endif %}
+            <ul class="gcs-resumen-notas">
+                <li>Entrega rápida a tu cuenta</li>
+                <li>Pago simulado con Nequi</li>
+                <li>Certificado de compra en PDF</li>
+            </ul>
+        </aside>
+    </form>
+
+    <script>
+        // Cuando el usuario elige un pack, actualizamos el resumen
+        // y cambiamos a qué paquete se envía el formulario.
+        var formulario = document.getElementById("form-pack");
+        var radios = formulario.querySelectorAll("input[name='pack']");
+
+        function elegir(radio) {
+            document.getElementById("resumen-nombre").textContent = radio.dataset.nombre;
+            document.getElementById("resumen-precio").textContent = "COP " + radio.dataset.precio;
+            document.getElementById("resumen-stock").textContent = radio.dataset.stock + " unidades";
+            formulario.action = "{{ url_for('agregar_al_carrito', paquete_id=0) }}".replace(/0$/, radio.value);
+        }
+
+        radios.forEach(function (radio) {
+            radio.addEventListener("change", function () { elegir(radio); });
+        });
+    </script>
+    {% else %}
+        <p class="gcs-catalogo-nota">Todavía no hay paquetes disponibles para este juego.</p>
+    {% endif %}
+</section>
+{% endblock %}

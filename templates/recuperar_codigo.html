@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block titulo %}Código de recuperación - GameCoins Store{% endblock %}
+
+{% block contenido %}
+<section class="gcs-form-wrap">
+    <form method="POST" class="gcs-form">
+        <img src="{{ url_for('static', filename='img/logo-simple.jpeg') }}" alt="GameCoins Store" class="gcs-form-logo">
+        <h1>Nueva contraseña</h1>
+        <p class="gcs-form-subtitulo">Si <strong>{{ correo }}</strong> tiene una cuenta, le enviamos un código de 6 números (vence en 10 minutos).</p>
+
+        <label for="codigo">Código del correo</label>
+        <input type="text" id="codigo" name="codigo" required autofocus maxlength="6"
+               inputmode="numeric" pattern="[0-9]{6}" autocomplete="one-time-code"
+               style="text-align:center; font-size:24px; letter-spacing:8px;">
+
+        <label for="contrasena">Contraseña nueva</label>
+        <input type="password" id="contrasena" name="contrasena" required minlength="6">
+
+        <label for="confirmar_contrasena">Repite la contraseña nueva</label>
+        <input type="password" id="confirmar_contrasena" name="confirmar_contrasena" required minlength="6">
+
+        <button type="submit" class="gcs-btn gcs-btn-primario gcs-btn-ancho">Cambiar contraseña</button>
+
+        <p class="gcs-form-alterna">
+            ¿No te llegó? Revisa spam o <a href="{{ url_for('recuperar_contrasena') }}">pide otro código</a>.
+        </p>
+    </form>
+</section>
+{% endblock %}

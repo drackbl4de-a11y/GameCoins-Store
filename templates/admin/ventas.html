@@ -1,0 +1,70 @@
+{% extends "admin/base_admin.html" %}
+{% from "admin/_filtro_fechas.html" import filtro_fechas, fecha_relativa %}
+{% block titulo %}Ventas - Admin{% endblock %}
+
+{% block contenido %}
+<div class="gcs-admin-header">
+    <h2>Ventas</h2>
+</div>
+
+{{ filtro_fechas(desde, hasta, ventas|length) }}
+
+<div class="gcs-admin-tabla-wrap">
+    <table class="gcs-admin-tabla">
+        <thead>
+            <tr><th>Código</th><th>Usuario</th><th>Fecha</th><th>Total</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+            {% for compra in ventas %}
+                <tr>
+                    <td>{{ compra.codigo_pedido }}</td>
+                    <td>{{ compra.usuario_nombre }}<br><span class="gcs-paquete-moneda">{{ compra.usuario_correo }}</span></td>
+                    <td>{{ fecha_relativa(compra.fecha_compra) }}</td>
+                    <td>
+                        {% if compra.estado_pedido == 'ENTREGADO' %}
+                            <span class="gcs-monto gcs-monto-suma">+ COP {{ "{:,.0f}".format(compra.total_cop).replace(",", ".") }}</span>
+                        {% elif compra.estado_pedido == 'CANCELADO' %}
+                            <span class="gcs-monto gcs-monto-resta">COP {{ "{:,.0f}".format(compra.total_cop).replace(",", ".") }}</span>
+                        {% else %}
+                            <span class="gcs-monto gcs-monto-pendiente">COP {{ "{:,.0f}".format(compra.total_cop).replace(",", ".") }}</span>
+                        {% endif %}
+                    </td>
+                    <td><span class="gcs-badge-estado gcs-badge-{{ compra.estado_pedido|lower }}">{{ compra.estado_pedido }}</span></td>
+                    <td>
+                        <a href="{{ url_for('admin.venta_detalle', compra_id=compra.compra_id) }}" class="gcs-btn gcs-btn-outline">Ver</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6">No hay ventas para mostrar.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{# ===== Total de dinero de las ventas mostradas ===== #}
+{% macro pesos(valor) %}COP {{ "{:,.0f}".format(valor).replace(",", ".") }}{% endmacro %}
+<section class="gcs-totales" aria-label="Total de dinero de las ventas">
+    <div class="gcs-totales-detalle">
+        <div class="gcs-total-caja gcs-total-suma">
+            <span class="gcs-total-etiqueta">Entregado · suma al total</span>
+            <strong>+ {{ pesos(totales.entregado) }}</strong>
+            <small>{{ totales.n_entregado }} pedido{{ 's' if totales.n_entregado != 1 }}</small>
+        </div>
+        <div class="gcs-total-caja gcs-total-resta">
+            <span class="gcs-total-etiqueta">Cancelado · no cuenta</span>
+            <strong>{{ pesos(totales.cancelado) }}</strong>
+            <small>{{ totales.n_cancelado }} pedido{{ 's' if totales.n_cancelado != 1 }}</small>
+        </div>
+        <div class="gcs-total-caja gcs-total-pendiente">
+            <span class="gcs-total-etiqueta">Procesado · aún no cuenta</span>
+            <strong>{{ pesos(totales.procesado) }}</strong>
+            <small>{{ totales.n_procesado }} pedido{{ 's' if totales.n_procesado != 1 }}</small>
+        </div>
+    </div>
+    <div class="gcs-total-final">
+        <span>TOTAL DE DINERO</span>
+        <strong>{{ pesos(totales.total) }}</strong>
+        <small>Solo pedidos entregados{% if desde or hasta %} · según el filtro de fechas{% endif %}</small>
+    </div>
+</section>
+{% endblock %}

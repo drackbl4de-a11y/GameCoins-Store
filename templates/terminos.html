@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block titulo %}Términos y condiciones - GameCoins Store{% endblock %}
+
+{% block contenido %}
+<section class="gcs-pagina">
+    <h1>Términos y condiciones</h1>
+    <p class="gcs-pagina-intro">Última actualización: septiembre de 2026.</p>
+
+    <div class="gcs-aviso">
+        <strong>Aviso legal:</strong> GameCoins Store es un proyecto académico. <strong>No se procesan pagos reales ni se realizan transacciones de dinero.</strong> Ningún dato de pago que ingreses genera un cobro.
+    </div>
+
+    <h2>1. Naturaleza del proyecto</h2>
+    <p>Este sitio simula el funcionamiento de una tienda de monedas para videojuegos con fines educativos. Las compras, los pagos con Nequi y los certificados de compra son simulaciones y no tienen validez comercial ni tributaria.</p>
+
+    <h2>2. Cuentas de usuario</h2>
+    <p>Para comprar debes crear una cuenta con datos verdaderos y mantener tu contraseña en reserva. Eres responsable de la actividad realizada desde tu cuenta. Podemos desactivar cuentas que se usen de forma indebida.</p>
+
+    <h2>3. Compras y pedidos</h2>
+    <p>Al confirmar una compra se crea un pedido que pasa por los estados PROCESADO, ENTREGADO o CANCELADO, según lo que decida el equipo administrador. Cuando el pedido pasa a ENTREGADO o CANCELADO te enviamos un correo con esa información. Los precios se muestran en pesos colombianos (COP) y pueden cambiar o tener promociones por tiempo limitado.</p>
+
+    <h2>4. Datos de entrega</h2>
+    <p>Debes indicar correctamente tu usuario de Roblox o tu ID de VALORANT. No nos hacemos responsables por entregas asociadas a datos escritos de forma incorrecta por el usuario.</p>
+
+    <h2>5. Comentarios y opiniones</h2>
+    <p>Puedes publicar opiniones sobre la plataforma. El equipo administrador puede eliminar los comentarios que sean ofensivos, engañosos o inapropiados.</p>
+
+    <h2>6. Marcas y propiedad intelectual</h2>
+    <p>Roblox, Robux, VALORANT y VALORANT Points son marcas de sus respectivos propietarios. GameCoins Store es un proyecto independiente, no está afiliado ni respaldado por ellos.</p>
+
+    <h2>7. Cambios a estos términos</h2>
+    <p>Podemos actualizar estos términos cuando el proyecto evolucione. La fecha de última actualización aparece al inicio de esta página.</p>
+
+    <h2>8. Contacto</h2>
+    <p>Si tienes preguntas sobre estos términos, escríbenos desde la página <a href="{{ url_for('contacto') }}">Contáctanos</a>.</p>
+</section>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "admin/base_admin.html" %}
+{% block titulo %}Dashboard - Admin{% endblock %}
+
+{% block contenido %}
+<div class="gcs-admin-header">
+    <h2>Dashboard</h2>
+</div>
+
+<div class="gcs-admin-stats">
+    <div class="gcs-admin-stat-card">
+        <i>💰</i>
+        <div><span>Ventas totales</span><strong>COP {{ "{:,.0f}".format(stats.ventas_totales).replace(",", ".") }}</strong></div>
+    </div>
+    <div class="gcs-admin-stat-card">
+        <i>🧾</i>
+        <div><span>Pedidos totales</span><strong>{{ stats.total_pedidos }}</strong></div>
+    </div>
+    <div class="gcs-admin-stat-card">
+        <i>👥</i>
+        <div><span>Usuarios registrados</span><strong>{{ stats.total_usuarios }}</strong></div>
+    </div>
+    <div class="gcs-admin-stat-card">
+        <i>✅</i>
+        <div><span>Usuarios activos</span><strong>{{ stats.usuarios_activos }}</strong></div>
+    </div>
+    <div class="gcs-admin-stat-card gcs-admin-stat-ancha">
+        <i>🏆</i>
+        <div>
+            <span>Paquete más vendido</span>
+            <strong style="font-size:17px;">
+                {% if stats.paquete_mas_vendido %}
+                    {{ stats.paquete_mas_vendido.nombre }} ({{ stats.paquete_mas_vendido.unidades }} und.)
+                {% else %}
+                    Sin datos aún
+                {% endif %}
+            </strong>
+        </div>
+    </div>
+</div>
+
+<h3 class="gcs-admin-subtitulo">Accesos rápidos</h3>
+<div class="gcs-admin-accesos">
+    <a href="{{ url_for('admin.juegos') }}"><i>🎮</i><strong>Juegos</strong><span>Agregar o editar juegos</span></a>
+    <a href="{{ url_for('admin.paquetes') }}"><i>📦</i><strong>Paquetes</strong><span>Precios y cantidades</span></a>
+    <a href="{{ url_for('admin.promociones') }}"><i>🏷️</i><strong>Promociones</strong><span>Descuentos activos</span></a>
+    <a href="{{ url_for('admin.ventas') }}"><i>🧾</i><strong>Ventas</strong><span>Revisar y entregar pedidos</span></a>
+    <a href="{{ url_for('admin.usuarios') }}"><i>👥</i><strong>Usuarios</strong><span>Activar o desactivar cuentas</span></a>
+    <a href="{{ url_for('admin.comentarios') }}"><i>💬</i><strong>Comentarios</strong><span>Moderar y responder</span></a>
+</div>
+{% endblock %}

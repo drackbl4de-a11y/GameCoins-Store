@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% import "_iconos.html" as iconos %}
+{% block titulo %}GameCoins Store - Inicio{% endblock %}
+
+{% block contenido %}
+<div class="gcs-hero-fondo">
+    <section class="gcs-hero">
+        <div class="gcs-hero-texto">
+            <span class="gcs-hero-pill">🎮 Monedas para tus videojuegos favoritos</span>
+            <h1>Recarga tus monedas <span class="gcs-hero-acento">al instante</span></h1>
+            <p>Robux y VALORANT Points, al mejor precio y en segundos. Sin vueltas, sin líos.</p>
+            <div class="gcs-hero-botones">
+                <a href="{{ url_for('juegos') }}" class="gcs-btn gcs-btn-primario gcs-btn-grande">Ver juegos</a>
+                {% if not session.get('usuario_id') %}
+                    <a href="{{ url_for('registro') }}" class="gcs-btn gcs-btn-outline gcs-btn-grande">Crear cuenta gratis</a>
+                {% else %}
+                    <a href="{{ url_for('promociones') }}" class="gcs-btn gcs-btn-outline gcs-btn-grande">Ver promociones</a>
+                {% endif %}
+            </div>
+        </div>
+        <img src="{{ url_for('static', filename='img/logo-completo.jpeg') }}" alt="GameCoins Store" class="gcs-hero-logo">
+    </section>
+</div>
+
+<div class="gcs-confianza">
+    <div class="gcs-confianza-item">
+        <span class="gcs-confianza-icono">⚡</span>
+        <div><strong>Entrega inmediata</strong>tras confirmar la compra</div>
+    </div>
+    <div class="gcs-confianza-item">
+        <span class="gcs-confianza-icono">🔒</span>
+        <div><strong>Pago simulado seguro</strong>sin cobros reales</div>
+    </div>
+    <div class="gcs-confianza-item">
+        <span class="gcs-confianza-icono">💬</span>
+        <div><strong>Soporte</strong>por WhatsApp</div>
+    </div>
+</div>
+
+{% if promociones %}
+<section class="gcs-catalogo-preview gcs-seccion-home">
+    <div class="gcs-seccion-header">
+        <h2>Promociones activas</h2>
+        <a href="{{ url_for('promociones') }}">Ver todas →</a>
+    </div>
+    <div class="gcs-paquete-grid">
+        {% for promo in promociones %}
+            <a href="{{ url_for('catalogo', juego_id=promo.juego_id) }}" class="gcs-paquete-card gcs-paquete-promo {{ iconos.clase_juego(promo.juego_nombre) }}">
+                <span class="gcs-badge-descuento">-{{ promo.porcentaje_descuento|int }}%</span>
+                {{ iconos.icono_producto(promo.juego_nombre, promo.promocion_id, promo.paquete_imagen_url or promo.moneda_imagen_url) }}
+                <p class="gcs-paquete-moneda">{{ promo.juego_nombre }}</p>
+                <h3>{{ promo.paquete_nombre }}</h3>
+                <p class="gcs-precio-original">COP {{ "{:,.0f}".format(promo.precio_cop).replace(",", ".") }}</p>
+                <p class="gcs-paquete-precio">COP {{ "{:,.0f}".format(promo.precio_con_descuento).replace(",", ".") }}</p>
+                    {% if promo.stock <= 0 %}<p class="gcs-paquete-agotado">AGOTADO</p>
+                    {% elif promo.stock <= 5 %}<p class="gcs-paquete-quedan">¡Quedan solo {{ promo.stock }}!</p>
+                    {% else %}<p class="gcs-paquete-disponibles">{{ promo.stock }} disponibles</p>{% endif %}
+            </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<section class="gcs-catalogo-preview gcs-seccion-home">
+    <div class="gcs-seccion-header">
+        <h2>Nuestros juegos</h2>
+        <a href="{{ url_for('juegos') }}">Ver todos →</a>
+    </div>
+    <div class="gcs-catalogo-grid">
+        {% for juego in juegos %}
+            {{ iconos.tarjeta_juego(juego) }}
+        {% endfor %}
+        <div class="gcs-juego-card gcs-juego-proximo">
+            <div class="gcs-juego-portada">✨</div>
+            <div class="gcs-juego-info">
+                <div class="gcs-juego-titulo">
+                    <h3>Próximamente</h3>
+                    <span class="gcs-juego-meta">Más juegos en camino</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="gcs-catalogo-preview gcs-seccion-home">
+    <div class="gcs-seccion-header">
+        <h2>Cómo funciona</h2>
+    </div>
+    <div class="gcs-pasos">
+        <div class="gcs-paso">
+            <div class="gcs-paso-numero">1</div>
+            <h3>Elige tu juego</h3>
+            <p>Explora el catálogo y escoge el paquete de monedas que necesitas.</p>
+        </div>
+        <div class="gcs-paso">
+            <div class="gcs-paso-numero">2</div>
+            <h3>Paga con Nequi</h3>
+            <p>Ingresa tus datos de entrega y confirma la compra (pago simulado).</p>
+        </div>
+        <div class="gcs-paso">
+            <div class="gcs-paso-numero">3</div>
+            <h3>Descarga tu certificado</h3>
+            <p>Sigue el estado de tu pedido; cuando sea entregado, descarga tu certificado de compra.</p>
+        </div>
+    </div>
+</section>
+
+{% if not session.get('usuario_id') %}
+<section class="gcs-cta-final">
+    <div class="gcs-cta-caja">
+        <div>
+            <h2>¿Listo para recargar?</h2>
+            <p>Crea tu cuenta gratis y haz tu primera compra en minutos.</p>
+        </div>
+        <a href="{{ url_for('registro') }}" class="gcs-btn gcs-btn-primario gcs-btn-grande">Crear cuenta gratis</a>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

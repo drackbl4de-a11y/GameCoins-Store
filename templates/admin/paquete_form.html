@@ -1,0 +1,53 @@
+{% extends "admin/base_admin.html" %}
+{% block titulo %}{{ "Editar paquete" if paquete else "Nuevo paquete" }} - Admin{% endblock %}
+
+{% block contenido %}
+<div class="gcs-admin-header">
+    <h2>{{ "Editar paquete" if paquete else "Nuevo paquete" }}</h2>
+</div>
+
+<form method="POST" enctype="multipart/form-data" class="gcs-admin-form">
+    <label for="moneda_id">Moneda / Juego</label>
+    <select id="moneda_id" name="moneda_id" required>
+        <option value="">Selecciona una opción</option>
+        {% for moneda in monedas %}
+            <option value="{{ moneda.moneda_id }}" {% if valores.get('moneda_id')|string == moneda.moneda_id|string %}selected{% endif %}>
+                {{ moneda.juego_nombre }} — {{ moneda.moneda_nombre }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <label for="nombre">Nombre del paquete</label>
+    <input type="text" id="nombre" name="nombre" value="{{ valores.get('nombre', '') }}" placeholder="Ej. 500 Robux" required>
+
+    <label for="descripcion">Descripción</label>
+    <textarea id="descripcion" name="descripcion" rows="2">{{ valores.get('descripcion', '') }}</textarea>
+
+    <div class="gcs-perfil-fila-doble">
+        <div>
+            <label for="cantidad_monedas">Cantidad de monedas</label>
+            <input type="number" id="cantidad_monedas" name="cantidad_monedas" value="{{ valores.get('cantidad_monedas', '') }}" min="1" required>
+        </div>
+        <div>
+            <label for="precio_cop">Precio (COP)</label>
+            <input type="number" id="precio_cop" name="precio_cop" value="{{ valores.get('precio_cop', '') }}" min="1" step="1" required>
+        </div>
+    </div>
+
+    <label for="stock">Stock (veces que se puede comprar)</label>
+    <input type="number" id="stock" name="stock" value="{{ valores.get('stock', 10) }}" min="0" step="1" required>
+    <p class="gcs-admin-ayuda">Cada compra descuenta unidades. Cuando llega a 0, el paquete aparece como AGOTADO.</p>
+
+    <label for="imagen">Imagen del paquete (opcional)</label>
+    {% if paquete and paquete.imagen_url %}
+        <img src="{{ url_for('static', filename=paquete.imagen_url) }}" alt="Imagen actual" class="gcs-admin-preview">
+    {% endif %}
+    <input type="file" id="imagen" name="imagen" accept="image/png,image/jpeg,image/webp,image/gif">
+    <p class="gcs-admin-ayuda">Si no subes una, el paquete usa el ícono de la moneda del juego.</p>
+
+    <div class="gcs-form-botones">
+        <button type="submit" class="gcs-btn gcs-btn-primario">{{ "Guardar cambios" if paquete else "Crear paquete" }}</button>
+        <a href="{{ url_for('admin.paquetes') }}" class="gcs-btn gcs-btn-outline">Cancelar</a>
+    </div>
+</form>
+{% endblock %}

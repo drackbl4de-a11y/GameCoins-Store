@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block titulo %}Políticas y seguridad - GameCoins Store{% endblock %}
+
+{% block contenido %}
+<section class="gcs-pagina">
+    <h1>Políticas y seguridad</h1>
+    <p class="gcs-pagina-intro">Cómo cuidamos tus datos dentro de GameCoins Store.</p>
+
+    <h2>Qué datos guardamos</h2>
+    <ul class="gcs-lista">
+        <li>Datos de tu cuenta: nombre, apellido y correo. Opcionalmente tu número de WhatsApp y tu foto de perfil.</li>
+        <li>Tu historial de pedidos y los datos de entrega que indicas (usuario de Roblox o ID de VALORANT).</li>
+        <li>Los comentarios que publicas en la sección de opiniones.</li>
+    </ul>
+
+    <h2>Cómo los protegemos</h2>
+    <ul class="gcs-lista">
+        <li><strong>Contraseñas cifradas:</strong> nunca se guardan en texto plano; solo se almacena una versión cifrada (hash).</li>
+        <li><strong>Consultas seguras:</strong> el sitio usa consultas parametrizadas en la base de datos para evitar inyecciones SQL.</li>
+        <li><strong>Roles separados:</strong> el panel de administrador tiene su propio inicio de sesión y solo es accesible para cuentas de administrador.</li>
+        <li><strong>Registro de acciones:</strong> los cambios que hace el equipo administrador quedan registrados en un historial de auditoría.</li>
+    </ul>
+
+    <h2>Datos de pago</h2>
+    <p>El pago con Nequi es simulado. No se realiza ningún cobro, y del número de celular que ingresas solo guardamos los últimos 4 dígitos junto con el nombre del titular.</p>
+
+    <h2>Lo que no hacemos</h2>
+    <p>No vendemos ni compartimos tus datos con terceros. Tampoco te pediremos tu contraseña por WhatsApp ni por ningún otro medio.</p>
+
+    <h2>Tus derechos</h2>
+    <p>Puedes actualizar tu nombre, tu número de WhatsApp, tu foto y tu contraseña desde <strong>Mi perfil</strong>. Si quieres que revisemos o eliminemos tu información, <a href="{{ url_for('contacto') }}">contáctanos</a>.</p>
+
+    <h2>Sesión</h2>
+    <p>Para mantenerte conectado usamos una sesión en tu navegador. Cierra sesión siempre que uses un equipo compartido.</p>
+</section>
+{% endblock %}

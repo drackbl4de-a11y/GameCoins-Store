@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+{% import "_iconos.html" as iconos %}
+{% block titulo %}Mi perfil - GameCoins Store{% endblock %}
+
+{% block contenido %}
+<section class="gcs-perfil-pagina">
+
+    {# ---------- Banner con los datos del usuario ---------- #}
+    <div class="gcs-perfil-banner">
+        <span class="gcs-forma gcs-forma-1">○</span>
+        <span class="gcs-forma gcs-forma-2">△</span>
+        <span class="gcs-forma gcs-forma-3">□</span>
+        <span class="gcs-forma gcs-forma-4">✕</span>
+        <span class="gcs-forma gcs-forma-5">△</span>
+        <span class="gcs-forma gcs-forma-6">○</span>
+
+        {% if usuario.foto_perfil_url %}
+            <img src="{{ url_for('static', filename=usuario.foto_perfil_url) }}" alt="Foto de perfil" class="gcs-banner-avatar">
+        {% else %}
+            <div class="gcs-banner-avatar gcs-banner-inicial">{{ usuario.nombre[0]|upper }}</div>
+        {% endif %}
+
+        <div class="gcs-banner-datos">
+            <h2>{{ usuario.nombre }}</h2>
+            <p>{{ usuario.correo }}</p>
+        </div>
+
+        <div class="gcs-banner-total">
+            <span>Total comprado</span>
+            <strong>COP {{ "{:,.0f}".format(resumen.gastado).replace(",", ".") }}</strong>
+        </div>
+
+        <span class="gcs-banner-desde">Miembro desde {{ usuario.fecha_registro|mes_anio }}</span>
+    </div>
+
+    {# ---------- Pestañas ---------- #}
+    <nav class="gcs-pestanas">
+        <a href="{{ url_for('perfil', tab='perfil') }}" class="{{ 'gcs-pestana-activa' if pestana == 'perfil' }}">Mi Perfil</a>
+        <a href="{{ url_for('perfil', tab='pedidos') }}" class="{{ 'gcs-pestana-activa' if pestana == 'pedidos' }}">Pedidos</a>
+        <a href="{{ url_for('perfil', tab='datos') }}" class="{{ 'gcs-pestana-activa' if pestana == 'datos' }}">Mis Datos</a>
+    </nav>
+
+
+    {# ====================== PESTAÑA 1: MI PERFIL ====================== #}
+    {% if pestana == 'perfil' %}
+    <div class="gcs-perfil-dos-columnas">
+
+        <div class="gcs-perfil-card">
+            <h3>Tu actividad en GameCoins</h3>
+            <div class="gcs-estadisticas">
+                <div>
+                    <strong>{{ resumen.pedidos }}</strong>
+                    <span>Pedidos realizados</span>
+                </div>
+                <div>
+                    <strong>{{ resumen.paquetes }}</strong>
+                    <span>Paquetes comprados</span>
+                </div>
+                <div>
+                    <strong>{{ dias_desde_primera }}</strong>
+                    <span>Días desde tu 1ª compra</span>
+                </div>
+            </div>
+
+            <h3 style="margin-top:26px;">Producto favorito</h3>
+            {% if favorito %}
+                <div class="gcs-favorito">
+                    {{ iconos.icono_producto(favorito.juego_nombre, 'fav', favorito.imagen_url or favorito.moneda_imagen_url) }}
+                    <div>
+                        <strong>{{ favorito.juego_nombre }}</strong>
+                        <p class="gcs-paquete-moneda" style="margin:2px 0 0;">{{ favorito.nombre }} · {{ favorito.unidades }} compra{{ 's' if favorito.unidades != 1 }}</p>
+                    </div>
+                    <span class="gcs-etiqueta-borde">Más comprado</span>
+                </div>
+            {% else %}
+                <p class="gcs-catalogo-nota" style="margin:0;">Todavía no tienes un favorito. <a href="{{ url_for('juegos') }}">Haz tu primera compra</a>.</p>
+            {% endif %}
+        </div>
+
+        <div class="gcs-perfil-columna-derecha">
+            <div class="gcs-ultima-compra">
+                <div class="gcs-ultima-compra-titulo">
+                    <div>
+                        <strong>Última compra</strong>
+                        {% if pedidos %}<span class="gcs-paquete-moneda">{{ pedidos[0].fecha_compra.strftime("%d/%m/%Y") }}</span>{% endif %}
+                    </div>
+                    {% if pedidos %}
+                        <span class="gcs-badge-estado gcs-badge-{{ pedidos[0].estado_pedido|lower }}">{{ pedidos[0].estado_pedido }}</span>
+                    {% endif %}
+                </div>
+
+                {% if pedidos %}
+                    {% set ultimo = pedidos[0] %}
+                    <div class="gcs-ultima-compra-cuerpo">
+                        {{ iconos.icono_producto(ultimo['items'][0].juego_nombre, 'ult', ultimo['items'][0].paquete_imagen_url or ultimo['items'][0].moneda_imagen_url) }}
+                        <div>
+                            <strong>{{ ultimo['items'][0].juego_nombre }}</strong>
+                            <p class="gcs-paquete-moneda" style="margin:2px 0 0;">
+                                {{ ultimo['items'][0].paquete_nombre }}{% if ultimo['items']|length > 1 %} y {{ ultimo['items']|length - 1 }} más{% endif %}
+                            </p>
+                            <span class="gcs-paquete-precio">COP {{ "{:,.0f}".format(ultimo.total_cop).replace(",", ".") }}</span>
+                        </div>
+                    </div>
+                    <div class="gcs-ultima-compra-acciones">
+                        <a href="{{ url_for('detalle_pedido', compra_id=ultimo.compra_id) }}">Ver pedido</a>
+                        <a href="{{ whatsapp_url }}" target="_blank">Ayuda</a>
+                    </div>
+                {% else %}
+                    <p class="gcs-catalogo-nota" style="margin:16px 20px 20px;">Aún no has comprado nada.</p>
+                {% endif %}
+            </div>
+
+            <h4 class="gcs-perfil-titulo-seccion">Beneficios GameCoins</h4>
+            <a href="{{ url_for('promociones') }}" class="gcs-beneficio">
+                <span class="gcs-beneficio-sub">Ofertas de hoy</span>
+                <strong>Promociones activas</strong>
+                <p>Compra tus monedas con descuento por tiempo limitado.</p>
+                <span class="gcs-beneficio-boton">EXPLORAR ›</span>
+            </a>
+            <a href="{{ url_for('comentarios') }}" class="gcs-beneficio gcs-beneficio-cian">
+                <span class="gcs-beneficio-sub">Tu voz cuenta</span>
+                <strong>Deja tu opinión</strong>
+                <p>Cuéntanos cómo fue tu experiencia en la tienda.</p>
+                <span class="gcs-beneficio-boton">OPINAR ›</span>
+            </a>
+        </div>
+    </div>
+
+
+    {# ====================== PESTAÑA 2: PEDIDOS ====================== #}
+    {% elif pestana == 'pedidos' %}
+        {% if pedidos %}
+            <div class="gcs-pedidos-lista">
+                {% for pedido in pedidos %}
+                    {% set primero = pedido['items'][0] %}
+                    <div class="gcs-pedido-item">
+                        {{ iconos.icono_producto(primero.juego_nombre, 'ped' ~ pedido.compra_id, primero.paquete_imagen_url or primero.moneda_imagen_url) }}
+                        <div class="gcs-pedido-info">
+                            <strong>{{ primero.juego_nombre }}</strong>
+                            <span class="gcs-paquete-moneda">
+                                {{ primero.paquete_nombre }}{% if pedido['items']|length > 1 %} y {{ pedido['items']|length - 1 }} más{% endif %}
+                            </span>
+                            <span class="gcs-paquete-moneda">{{ pedido.codigo_pedido }}</span>
+                        </div>
+                        <strong class="gcs-pedido-total">COP {{ "{:,.0f}".format(pedido.total_cop).replace(",", ".") }}</strong>
+                        <span class="gcs-paquete-moneda">{{ pedido.fecha_compra.strftime("%d/%m/%Y") }}</span>
+                        <span class="gcs-badge-estado gcs-badge-{{ pedido.estado_pedido|lower }}">{{ pedido.estado_pedido }}</span>
+                        <div class="gcs-pedido-links">
+                            <a href="{{ url_for('detalle_pedido', compra_id=pedido.compra_id) }}">Ver detalle</a>
+                            {% if pedido.estado_pedido == 'ENTREGADO' %}
+                                <a href="{{ url_for('descargar_certificado', compra_id=pedido.compra_id) }}">Certificado</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="gcs-catalogo-nota">Todavía no has hecho ninguna compra. <a href="{{ url_for('inicio') }}">Explora el catálogo</a>.</p>
+        {% endif %}
+
+
+    {# ====================== PESTAÑA 3: MIS DATOS ====================== #}
+    {% else %}
+    <div class="gcs-perfil-layout">
+        <aside class="gcs-perfil-sidebar">
+            {% if usuario.foto_perfil_url %}
+                <img src="{{ url_for('static', filename=usuario.foto_perfil_url) }}" alt="Foto de perfil" class="gcs-avatar-imagen">
+            {% else %}
+                <div class="gcs-avatar-inicial">{{ usuario.nombre[0]|upper }}</div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('actualizar_foto') }}" enctype="multipart/form-data" class="gcs-perfil-form-foto">
+                <label for="foto" class="gcs-btn gcs-btn-outline gcs-btn-ancho gcs-perfil-label-archivo">Cambiar foto</label>
+                <input type="file" id="foto" name="foto" accept="image/*" class="gcs-perfil-input-archivo" onchange="this.form.submit()">
+            </form>
+
+            <a href="{{ url_for('logout') }}" class="gcs-btn gcs-btn-outline gcs-btn-ancho" style="margin-top:12px;">Cerrar mi sesión</a>
+        </aside>
+
+        <div class="gcs-perfil-main">
+            <div class="gcs-perfil-card">
+                <h3>Datos personales</h3>
+                <form method="POST" action="{{ url_for('actualizar_datos_perfil') }}">
+                    <label for="correo_perfil">E-mail</label>
+                    <input type="email" id="correo_perfil" value="{{ usuario.correo }}" disabled>
+
+                    <div class="gcs-perfil-fila-doble">
+                        <div>
+                            <label for="nombre">Nombre</label>
+                            <input type="text" id="nombre" name="nombre" value="{{ usuario.nombre }}" required>
+                        </div>
+                        <div>
+                            <label for="apellido">Apellido</label>
+                            <input type="text" id="apellido" name="apellido" value="{{ usuario.apellido }}" required>
+                        </div>
+                    </div>
+
+                    <label for="telefono">Núm. de WhatsApp (para entrega del código)</label>
+                    <input type="text" id="telefono" name="telefono" value="{{ usuario.telefono or '' }}" placeholder="+57 300 000 0000">
+
+                    <button type="submit" class="gcs-btn gcs-btn-primario" style="margin-top:18px;">Guardar cambios</button>
+                </form>
+
+                <details class="gcs-redefinir">
+                    <summary>Redefinir contraseña</summary>
+                    <form method="POST" action="{{ url_for('cambiar_contrasena') }}">
+                        <label for="contrasena_actual">Contraseña actual</label>
+                        <input type="password" id="contrasena_actual" name="contrasena_actual" required>
+
+                        <div class="gcs-perfil-fila-doble">
+                            <div>
+                                <label for="nueva_contrasena">Nueva contraseña</label>
+                                <input type="password" id="nueva_contrasena" name="nueva_contrasena" required minlength="6">
+                            </div>
+                            <div>
+                                <label for="confirmar_nueva_contrasena">Repite la nueva contraseña</label>
+                                <input type="password" id="confirmar_nueva_contrasena" name="confirmar_nueva_contrasena" required minlength="6">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="gcs-btn gcs-btn-primario" style="margin-top:18px;">Actualizar contraseña</button>
+                    </form>
+                </details>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</section>
+{% endblock %}

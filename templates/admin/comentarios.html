@@ -1,0 +1,65 @@
+{% extends "admin/base_admin.html" %}
+{% from "admin/_filtro_fechas.html" import filtro_fechas %}
+{% block titulo %}Comentarios - Admin{% endblock %}
+
+{% block contenido %}
+<div class="gcs-admin-centrado">
+    <div class="gcs-admin-header">
+        <h2>Comentarios</h2>
+        {% set sin_responder = comentarios|rejectattr("respuesta_admin")|list|length %}
+        <span class="gcs-admin-badge {{ 'gcs-admin-badge-activo' if sin_responder == 0 else 'gcs-admin-badge-pendiente' }}">
+            {{ sin_responder }} sin responder
+        </span>
+    </div>
+
+    {{ filtro_fechas(desde, hasta, comentarios|length) }}
+
+    {% for c in comentarios %}
+        <article class="gcs-admin-comentario">
+            <div class="gcs-comentario-avatar">
+                        {% if c.usuario_foto %}
+                            <img src="{{ url_for('static', filename=c.usuario_foto) }}" alt="" class="gcs-comentario-foto">
+                        {% else %}
+                            {{ c.usuario_nombre[0]|upper }}
+                        {% endif %}
+                    </div>
+            <div class="gcs-comentario-cuerpo">
+                <div class="gcs-comentario-header">
+                    <strong>{{ c.usuario_nombre }}</strong>
+                    <span class="gcs-paquete-moneda" title="{{ c.fecha_comentario.strftime('%d/%m/%Y %H:%M') }}">
+                        {{ c.fecha_comentario|hace }} · {{ c.fecha_comentario.strftime("%d/%m/%Y") }}
+                    </span>
+                </div>
+                <span class="gcs-estrellas-lectura">
+                    {% for i in range(1, 6) %}{% if i <= c.calificacion %}★{% else %}☆{% endif %}{% endfor %}
+                </span>
+                <p>{{ c.contenido }}</p>
+
+                {% if c.respuesta_admin %}
+                    <div class="gcs-respuesta">
+                        <span class="gcs-respuesta-titulo">Tu respuesta · {{ c.fecha_respuesta|hace }}</span>
+                        <p>{{ c.respuesta_admin }}</p>
+                    </div>
+                {% endif %}
+
+                <div class="gcs-admin-comentario-acciones">
+                    <details>
+                        <summary class="gcs-btn gcs-btn-outline">{{ "Editar respuesta" if c.respuesta_admin else "Responder" }}</summary>
+                        <form method="POST" action="{{ url_for('admin.comentario_responder', comentario_id=c.comentario_id) }}">
+                            <textarea name="respuesta" rows="3" maxlength="500" class="gcs-textarea"
+                                      placeholder="Escribe tu respuesta (máximo 500 caracteres)...">{{ c.respuesta_admin or "" }}</textarea>
+                            <button type="submit" class="gcs-btn gcs-btn-primario">Publicar respuesta</button>
+                        </form>
+                    </details>
+                    <form method="POST" action="{{ url_for('admin.comentario_eliminar', comentario_id=c.comentario_id) }}"
+                          onsubmit="return confirm('¿Eliminar este comentario? Esta acción no se puede deshacer.');">
+                        <button type="submit" class="gcs-btn gcs-btn-peligro">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </article>
+    {% else %}
+        <p class="gcs-catalogo-nota">No hay comentarios para mostrar.</p>
+    {% endfor %}
+</div>
+{% endblock %}

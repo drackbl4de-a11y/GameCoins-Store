@@ -1,0 +1,40 @@
+{% extends "admin/base_admin.html" %}
+{% block titulo %}{{ "Editar juego" if juego else "Nuevo juego" }} - Admin{% endblock %}
+
+{% block contenido %}
+<div class="gcs-admin-header">
+    <h2>{{ "Editar juego" if juego else "Nuevo juego" }}</h2>
+</div>
+
+<form method="POST" enctype="multipart/form-data" class="gcs-admin-form">
+    <label for="nombre">Nombre del juego</label>
+    <input type="text" id="nombre" name="nombre" value="{{ valores.get('nombre', '') }}" required>
+
+    <label for="descripcion">Descripción</label>
+    <textarea id="descripcion" name="descripcion" rows="3">{{ valores.get('descripcion', '') }}</textarea>
+
+    {% if not juego %}
+        <label for="nombre_moneda">Nombre de la moneda de este juego</label>
+        <input type="text" id="nombre_moneda" name="nombre_moneda" value="{{ valores.get('nombre_moneda', '') }}" placeholder="Ej. V-Bucks" required>
+    {% endif %}
+
+    <label for="logo">Logo del juego (opcional)</label>
+    {% if juego and juego.imagen_url %}
+        <img src="{{ url_for('static', filename=juego.imagen_url) }}" alt="Logo actual" class="gcs-admin-preview">
+    {% endif %}
+    <input type="file" id="logo" name="logo" accept="image/png,image/jpeg,image/webp,image/gif">
+    <p class="gcs-admin-ayuda">Se muestra en las tarjetas de inicio y en el catálogo del juego. Lo ideal es un PNG con fondo transparente.</p>
+
+    <label for="icono_moneda">Ícono de la moneda (opcional)</label>
+    {% if moneda and moneda.imagen_url %}
+        <img src="{{ url_for('static', filename=moneda.imagen_url) }}" alt="Ícono actual" class="gcs-admin-preview">
+    {% endif %}
+    <input type="file" id="icono_moneda" name="icono_moneda" accept="image/png,image/jpeg,image/webp,image/gif">
+    <p class="gcs-admin-ayuda">Se muestra en cada paquete de este juego que no tenga una imagen propia.</p>
+
+    <div class="gcs-form-botones">
+        <button type="submit" class="gcs-btn gcs-btn-primario">{{ "Guardar cambios" if juego else "Crear juego" }}</button>
+        <a href="{{ url_for('admin.juegos') }}" class="gcs-btn gcs-btn-outline">Cancelar</a>
+    </div>
+</form>
+{% endblock %}

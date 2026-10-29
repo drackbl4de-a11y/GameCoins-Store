@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% import "_iconos.html" as iconos %}
+{% block titulo %}Juegos - GameCoins Store{% endblock %}
+
+{% block contenido %}
+<section class="gcs-catalogo-preview">
+    <h2>Todos los juegos</h2>
+
+    {% if juegos %}
+        <div class="gcs-catalogo-grid">
+            {% for juego in juegos %}
+                {{ iconos.tarjeta_juego(juego) }}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="gcs-catalogo-nota">Todavía no hay juegos disponibles.</p>
+    {% endif %}
+</section>
+{% endblock %}
